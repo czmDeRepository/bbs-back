@@ -1,0 +1,1425 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/article/": {
+            "get": {
+                "tags": [
+                    "article"
+                ],
+                "operationId": "ArticleController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "title",
+                        "description": "论贴标题",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "categoryId",
+                        "description": "论贴分类",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "userId",
+                        "description": "创建者id",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "description": "状态 -1 已删除 1-未发布，2-已经发布",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "createTime",
+                        "description": "创建时间",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "updateTime",
+                        "description": "更新时间",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageNum",
+                        "description": "页数",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "页面大小",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "isDesc",
+                        "description": "false",
+                        "type": "boolean"
+                    },
+                    {
+                        "in": "query",
+                        "name": "orderIndex",
+                        "description": "0-更新时间 1-创建时间 2-阅读数量 3-点赞数量",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "article"
+                ],
+                "operationId": "ArticleController.Put",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "title",
+                        "description": "论贴标题",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "categoryId",
+                        "description": "论贴分类",
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "userId",
+                        "description": "创建者id",
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "article"
+                ],
+                "operationId": "ArticleController.Post",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/article/follow": {
+            "post": {
+                "tags": [
+                    "article"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "articleId",
+                        "description": "论贴id",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/article/unfollow": {
+            "delete": {
+                "tags": [
+                    "article"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "articleId",
+                        "description": "论贴id",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/article/{id}": {
+            "get": {
+                "tags": [
+                    "article"
+                ],
+                "operationId": "ArticleController.Get",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "article"
+                ],
+                "operationId": "ArticleController.Delete",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/category/": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "operationId": "CategoryController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "description": "category name",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageNum",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "createTime",
+                        "description": "false",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "updateTime",
+                        "description": "false",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "category"
+                ],
+                "description": "更新主题信息",
+                "operationId": "CategoryController.Put",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "name",
+                        "description": "name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "createTime",
+                        "description": "创建时间",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "updateTime",
+                        "description": "更新时间",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "category"
+                ],
+                "operationId": "CategoryController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "name",
+                        "description": "name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/category/{id}": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "operationId": "CategoryController.Get",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "category"
+                ],
+                "operationId": "CategoryController.Delete",
+                "responses": {
+                    "1000": {
+                        "description": ":参数错误"
+                    },
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/": {
+            "get": {
+                "tags": [
+                    "comment"
+                ],
+                "operationId": "CommentController.GetAll",
+                "parameters": [
+                    {
+                        "in": "int64",
+                        "name": "articleId",
+                        "description": "主论贴id",
+                        "schema": {
+                            "$ref": "#/definitions/query"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "userId",
+                        "description": "评论者id",
+                        "schema": {
+                            "$ref": "#/definitions/query"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "repliedUserId",
+                        "description": "被回复者id -1 表示评论论贴",
+                        "schema": {
+                            "$ref": "#/definitions/query"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "supportCount",
+                        "description": "点赞数量",
+                        "schema": {
+                            "$ref": "#/definitions/query"
+                        }
+                    },
+                    {
+                        "in": "int32",
+                        "name": "status",
+                        "description": "状态 1：正常 -1：已删除",
+                        "schema": {
+                            "$ref": "#/definitions/query"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageNum",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "comment"
+                ],
+                "operationId": "CommentController.Put",
+                "parameters": [
+                    {
+                        "in": "int64",
+                        "name": "id",
+                        "description": "评论id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "supportCount",
+                        "description": "点赞数量",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int32",
+                        "name": "status",
+                        "description": "状态 1：正常 -1：已删除",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "string",
+                        "name": "content",
+                        "description": "内容",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "comment"
+                ],
+                "operationId": "CommentController.Post",
+                "parameters": [
+                    {
+                        "in": "int64",
+                        "name": "articleId",
+                        "description": "主论贴id",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "repliedUserId",
+                        "description": "被回复者id -1 表示评论论贴",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "supportCount",
+                        "description": "点赞数量",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int32",
+                        "name": "status",
+                        "description": "状态 1：正常 -1：已删除",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "string",
+                        "name": "content",
+                        "description": "内容",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "comment"
+                ],
+                "operationId": "CommentController.Delete",
+                "parameters": [
+                    {
+                        "in": "int64",
+                        "name": "id",
+                        "description": "消息id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "articleId",
+                        "description": "主论贴id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "repliedUserId",
+                        "description": "被回复者id",
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/comment/count/{articleId}": {
+            "get": {
+                "tags": [
+                    "comment"
+                ],
+                "operationId": "CommentController.Get",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/comment/{id}": {
+            "get": {
+                "tags": [
+                    "comment"
+                ],
+                "operationId": "CommentController.Get",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/label/": {
+            "get": {
+                "tags": [
+                    "label"
+                ],
+                "operationId": "LabelController.GetAll",
+                "parameters": [
+                    {
+                        "in": "string",
+                        "name": "name",
+                        "description": "标签名",
+                        "schema": {
+                            "$ref": "#/definitions/query"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageNum",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "createTime",
+                        "description": "false",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "updateTime",
+                        "description": "false",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "label"
+                ],
+                "operationId": "LabelController.Put",
+                "parameters": [
+                    {
+                        "in": "string",
+                        "name": "name",
+                        "description": "标签名",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    },
+                    {
+                        "in": "int64",
+                        "name": "id",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/body"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "label"
+                ],
+                "operationId": "LabelController.Post",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/label/{id}": {
+            "get": {
+                "tags": [
+                    "label"
+                ],
+                "operationId": "LabelController.Get",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        },
+        "/upload": {
+            "post": {
+                "tags": [
+                    "bbs-back/controllersPublicController"
+                ],
+                "operationId": "PublicController.Upload",
+                "parameters": [
+                    {
+                        "in": "File",
+                        "name": "image",
+                        "description": "上传文件",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ]
+            }
+        },
+        "/user/": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "description": "获取用户列表",
+                "operationId": "UserController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "description": "user name",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "account",
+                        "description": "user account",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "role",
+                        "description": "user role -1: 超级管理员 0：管理员 1：普通用户",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "description": "user status 1-正常使用 2-已注销 3-黑名单",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageNum",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "false",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "403": {
+                        "description": ":pageNum or pageSize is empty"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "user"
+                ],
+                "description": "更新用户信息",
+                "operationId": "UserController.Put",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "id",
+                        "description": "user id",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "name",
+                        "description": "user name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "password",
+                        "description": "user password",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "account",
+                        "description": "user account",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "email",
+                        "description": "邮箱",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "telephoneNumber",
+                        "description": "手机号",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "age",
+                        "description": "年龄",
+                        "schema": {
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "body",
+                        "name": "status",
+                        "description": "user status 1-正常使用 2-已注销 3-黑名单",
+                        "schema": {
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "body",
+                        "name": "role",
+                        "description": "user role -1: 超级管理员 1：管理员 2：普通用户",
+                        "schema": {
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "body",
+                        "name": "createTime",
+                        "description": "创建时间",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "updateTime",
+                        "description": "更新时间",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "gender",
+                        "description": "性别",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "新增用户",
+                "operationId": "UserController.Post",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "user name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "password",
+                        "description": "user password",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "account",
+                        "description": "user account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formDate",
+                        "name": "email",
+                        "description": "邮箱",
+                        "type": "string"
+                    },
+                    {
+                        "in": "fromData",
+                        "name": "telephoneNumber",
+                        "description": "手机号",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "age",
+                        "description": "年龄",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "status",
+                        "description": "user status 1-正常使用 2-已注销 3-黑名单",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "role",
+                        "description": "user role -1: 超级管理员 1：管理员 2：普通用户",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "fromData",
+                        "name": "createTime",
+                        "description": "创建时间",
+                        "type": "string"
+                    },
+                    {
+                        "in": "fromData",
+                        "name": "updateTime",
+                        "description": "更新时间",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formDate",
+                        "name": "gender",
+                        "description": "性别",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formDate",
+                        "name": "ImageUrl",
+                        "description": "头像路径",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "user"
+                ],
+                "description": "删除用户",
+                "operationId": "UserController.Delete",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "id",
+                        "description": "user name",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "account",
+                        "description": "user account",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "role",
+                        "description": "user role -1: 超级管理员 0：管理员 1：普通用户",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "description": "user status 1-正常使用 2-已注销 3-黑名单",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageNum",
+                        "description": "true",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "true",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "403": {
+                        "description": ":pageNum or pageSize is empty"
+                    }
+                }
+            }
+        },
+        "/user/follow": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "description": "获取关注列表",
+                "operationId": "UserController.Follow",
+                "parameters": [
+                    {
+                        "in": "Query",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "Query",
+                        "name": "followFlag",
+                        "description": "关注我的人和我关注的人标识,true:关注我的人",
+                        "required": true,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "1000": {
+                        "description": ":缺少参数或存在非法参数"
+                    },
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "获取关注列表",
+                "operationId": "UserController.FollowPost",
+                "parameters": [
+                    {
+                        "in": "Query",
+                        "name": "targetId",
+                        "description": "被关注者id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "1000": {
+                        "description": ":缺少参数或存在非法参数"
+                    },
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "user"
+                ],
+                "description": "获取关注列表",
+                "operationId": "UserController.FollowDelete",
+                "parameters": [
+                    {
+                        "in": "Query",
+                        "name": "targetId",
+                        "description": "被关注者id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "1000": {
+                        "description": ":缺少参数或存在非法参数"
+                    },
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "description": "login system",
+                "operationId": "UserController.Login",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "account",
+                        "description": "user account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "password",
+                        "description": "user password",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "description": "get user by id",
+                "operationId": "UserController.Get",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Result"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
+                    }
+                }
+            }
+        },
+        "/ws/chat": {
+            "get": {
+                "tags": [
+                    "ws"
+                ],
+                "operationId": "WebSocketController.Join",
+                "responses": {
+                    "": {
+                        "description": ""
+                    },
+                    "1000": {
+                        "description": ":参数错误"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Time": {
+            "title": "Time",
+            "type": "object"
+        },
+        "body": {
+            "title": "body",
+            "type": "object"
+        },
+        "dto.Result": {
+            "title": "Result",
+            "type": "object"
+        },
+        "query": {
+            "title": "query",
+            "type": "object"
+        },
+        "true": {
+            "title": "true",
+            "type": "object"
+        }
+    },
+    "tags": [
+        {
+            "name": "user",
+            "description": "Operations about Users\n"
+        }
+    ]
+}
