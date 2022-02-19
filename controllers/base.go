@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"bbs-back/base/common"
-	"bbs-back/base/database/bbsRedis"
 	"bbs-back/base/enum"
+	"bbs-back/base/storage"
 	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/dgrijalva/jwt-go"
@@ -18,14 +18,13 @@ type BaseController struct {
 }
 
 const (
-	RESPONSE = "json"
+	RESPONSE                   = "json"
 	USER_TOKEN_CREATE_TIME_KEY = "USER_TOKEN_KEY"
 )
 
 func (controller *BaseController) Prepare() {
 	//log.Println("prepare")
 }
-
 
 // 解析时间参数
 func (controller *BaseController) ParseForm(obj interface{}) error {
@@ -34,14 +33,14 @@ func (controller *BaseController) ParseForm(obj interface{}) error {
 		return err
 	}
 	res := beego.ParseForm(form, obj)
-	setDateTime(controller.GetString("createTime"), obj,"CreateTime")
-	setDateTime(controller.GetString("updateTime"), obj,"UpdateTime")
+	setDateTime(controller.GetString("createTime"), obj, "CreateTime")
+	setDateTime(controller.GetString("updateTime"), obj, "UpdateTime")
 	return res
 }
 
 // 设置时间
-func setDateTime(timeValue string, obj interface{}, name string)  {
-	if timeValue != ""  {
+func setDateTime(timeValue string, obj interface{}, name string) {
+	if timeValue != "" {
 		v := reflect.ValueOf(obj)
 		elem := v.Elem()
 		fieldV := elem.FieldByName(name)
@@ -53,13 +52,13 @@ func setDateTime(timeValue string, obj interface{}, name string)  {
 	}
 }
 
-func (controller *BaseController) end(data common.Result)  {
+func (controller *BaseController) end(data common.Result) {
 	controller.Data[RESPONSE] = data
 	controller.ServeJSON()
 }
 
 // 解析token
-func ValidateToken(tokenString string)  (*jwt.Token, error)  {
+func ValidateToken(tokenString string) (*jwt.Token, error) {
 	parse, err := jwt.Parse(tokenString,
 		func(token *jwt.Token) (interface{}, error) {
 			//验证是否是给定的加密算法
@@ -87,7 +86,7 @@ func (controller *BaseController) getCurUserId() int64 {
 	if curUserId == "" {
 		token := header.Get("token")
 		if token == "" {
-			panic(common.NewErrorWithCode(common.ERROR_TOKEN_NOEXIST,common.ERROR_MESSAGE[common.ERROR_TOKEN_NOEXIST]))
+			panic(common.NewErrorWithCode(common.ERROR_TOKEN_NOEXIST, common.ERROR_MESSAGE[common.ERROR_TOKEN_NOEXIST]))
 		}
 		parseToken, err := ValidateToken(token)
 		if err != nil {
@@ -104,7 +103,7 @@ func (controller *BaseController) getCurUserId() int64 {
 }
 func checkIsOnLineUser(claims jwt.MapClaims) string {
 	userId := fmt.Sprintf("%v", claims["id"])
-	createTime, _ := redis.Int64(bbsRedis.HGet(USER_TOKEN_CREATE_TIME_KEY, userId))
+	createTime, _ := redis.Int64(storage.GetRedisPool().HGet(USER_TOKEN_CREATE_TIME_KEY, userId))
 	if createTime != int64(claims["iat"].(float64)) {
 		panic(common.NewErrorWithCode(common.ERROR_TOKEN_EXPIRE, common.ERROR_MESSAGE[common.ERROR_TOKEN_EXPIRE]))
 	}

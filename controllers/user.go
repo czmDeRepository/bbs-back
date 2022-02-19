@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"bbs-back/base/common"
-	"bbs-back/base/database/bbsRedis"
 	"bbs-back/base/dto"
+	"bbs-back/base/storage"
 	"bbs-back/models"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/dgrijalva/jwt-go"
@@ -63,7 +63,7 @@ func (controller *UserController) GetAll() {
 	// 多用户获取需要权限
 	if param.Id == 0 {
 		role := controller.getCurUserRole()
-		if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN  {
+		if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN {
 			controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 			return
 		}
@@ -84,7 +84,6 @@ func (controller *UserController) GetAll() {
 	res.Total = total
 	controller.end(common.SuccessWithData(res))
 }
-
 
 // @Title Put
 // @Description 更新用户信息
@@ -111,7 +110,6 @@ func (controller *UserController) Put() {
 		return
 	}
 	role := controller.getCurUserRole()
-
 
 	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN {
 		curUserId := controller.getCurUserId()
@@ -158,7 +156,7 @@ func (controller *UserController) Delete() {
 
 var SecretKey string
 
-func init()  {
+func init() {
 	SecretKey, _ = beego.AppConfig.String("secretKey")
 }
 
@@ -190,10 +188,9 @@ func (controller *UserController) Post() {
 		return
 	}
 	token, createTime, _ := createToken(u)
-	bbsRedis.HSet(USER_TOKEN_CREATE_TIME_KEY, strconv.FormatInt(u.Id, 10),  createTime)
+	storage.GetRedisPool().HSet(USER_TOKEN_CREATE_TIME_KEY, strconv.FormatInt(u.Id, 10), createTime)
 	controller.end(common.SuccessWithData(token))
 }
-
 
 // @Title Login
 // @Description login system
@@ -202,27 +199,27 @@ func (controller *UserController) Post() {
 // @Success 200 {object} dto.Result
 // @Failure 403 :id is empty
 // @router /login [get]
-func (controller *UserController) Login()  {
+func (controller *UserController) Login() {
 	account := controller.GetString("account")
 	password := controller.GetString("password")
 	if account == "" || password == "" {
-		controller.end(common.ErrorWithMe(nil,"账号密码非空"))
+		controller.end(common.ErrorWithMe(nil, "账号密码非空"))
 	}
 	param := new(models.User)
 	param.Account = account
 	param.Password = password
 	user, err := param.FindOne()
 	if err != nil {
-		controller.end(common.ErrorWithMe(err,"用户不存在或密码错误 "))
+		controller.end(common.ErrorWithMe(err, "用户不存在或密码错误 "))
 		return
 	}
 
 	switch user.Status {
 	case models.USER_STATUS_BLACKLIST:
-		controller.end(common.ErrorWithMe(nil,"您目前被限制登陆，请联系管理员解锁！！！"))
+		controller.end(common.ErrorWithMe(nil, "您目前被限制登陆，请联系管理员解锁！！！"))
 		return
 	case models.USER_STATUS_CANCELLATION:
-		controller.end(common.ErrorWithMe(nil,"当前账号已注销！！！"))
+		controller.end(common.ErrorWithMe(nil, "当前账号已注销！！！"))
 		return
 	}
 
@@ -231,7 +228,7 @@ func (controller *UserController) Login()  {
 		controller.end(common.ErrorMeWithCode(err.Error(), common.ERROR_TOKEN_CREATE))
 		return
 	}
-	bbsRedis.HSet(USER_TOKEN_CREATE_TIME_KEY, strconv.FormatInt(user.Id, 10),  createTime)
+	storage.GetRedisPool().HSet(USER_TOKEN_CREATE_TIME_KEY, strconv.FormatInt(user.Id, 10), createTime)
 	controller.end(common.SuccessWithData(tokenString))
 }
 
@@ -269,7 +266,7 @@ func (controller *UserController) Refresh() {
 		controller.end(common.HandleError(err))
 		return
 	}
-	bbsRedis.HSet(USER_TOKEN_CREATE_TIME_KEY, strconv.FormatInt(userId, 10),  createTime)
+	storage.GetRedisPool().HSet(USER_TOKEN_CREATE_TIME_KEY, strconv.FormatInt(userId, 10), createTime)
 	controller.end(common.SuccessWithData(token))
 }
 

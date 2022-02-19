@@ -1,4 +1,4 @@
-package baseconf
+package storage
 
 import (
 	"github.com/beego/beego/v2/client/orm"
@@ -6,8 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func init() {
-
+func initORM() {
 	dbUser, _ := beego.AppConfig.String("dbuser")
 	dbPwd, _ := beego.AppConfig.String("dbpwd")
 	dbHost, _ := beego.AppConfig.String("dbhost")

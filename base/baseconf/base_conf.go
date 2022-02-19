@@ -8,7 +8,7 @@ import (
 // 文件限制大小
 var MAX_FILE_LIMIT int64
 
-func init()  {
+func Init() {
 
 	maxFileLimit, err := beego.AppConfig.Int64("maxFileLimit")
 	// 10485760 = 1024 * 1024 * 4   5M

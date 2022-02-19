@@ -8,8 +8,8 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gomodule/redigo v2.0.0+incompatible
+	github.com/gorilla/websocket v1.4.2
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4

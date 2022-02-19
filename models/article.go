@@ -2,8 +2,8 @@ package models
 
 import (
 	"bbs-back/base/common"
-	"bbs-back/base/database/bbsRedis"
 	"bbs-back/base/dto/information"
+	"bbs-back/base/storage"
 	"bytes"
 	"github.com/beego/beego/v2/client/orm"
 	"strconv"
@@ -11,20 +11,19 @@ import (
 )
 
 type Article struct {
-	Id				int64		`json:"id" form:"id" orm:"pk"`
-	Title			string		`json:"title" form:"title"`
-	CategoryId		int64		`json:"categoryId" form:"categoryId"`
-	UserId			int64		`json:"userId" form:"userId"`
-	Status			int32		`json:"status" form:"status"`	// -1 已删除 1-未发布，2-已经发布
-	ReadCount		int32		`json:"readCount" form:"readCount"`
-	CreateTime common.DateTime `json:"createTime" form:"createTime" orm:"auto_now_add;type(datetime);"`
-	UpdateTime common.DateTime `json:"updateTime" form:"updateTime" orm:"column(update_time)"`
-	Content			string		`json:"content" form:"content"`
-	LabelList 		[]*Label 	`json:"labelList" form:"labelList" orm:"-"`	// 关联标签
-	FollowingFlag		bool	`json:"followingFlag" form:"followingFlag" orm:"-"` // 是否关注
-	FollowCount		int64		`json:"followCount" form:"followCount" orm:"-"` // 关注数量
+	Id            int64           `json:"id" form:"id" orm:"pk"`
+	Title         string          `json:"title" form:"title"`
+	CategoryId    int64           `json:"categoryId" form:"categoryId"`
+	UserId        int64           `json:"userId" form:"userId"`
+	Status        int32           `json:"status" form:"status"` // -1 已删除 1-未发布，2-已经发布
+	ReadCount     int32           `json:"readCount" form:"readCount"`
+	CreateTime    common.DateTime `json:"createTime" form:"createTime" orm:"auto_now_add;type(datetime);"`
+	UpdateTime    common.DateTime `json:"updateTime" form:"updateTime" orm:"column(update_time)"`
+	Content       string          `json:"content" form:"content"`
+	LabelList     []*Label        `json:"labelList" form:"labelList" orm:"-"`         // 关联标签
+	FollowingFlag bool            `json:"followingFlag" form:"followingFlag" orm:"-"` // 是否关注
+	FollowCount   int64           `json:"followCount" form:"followCount" orm:"-"`     // 关注数量
 }
-
 
 func (a *Article) Read() (*Article, error) {
 	res := new(Article)
@@ -38,7 +37,7 @@ func (a *Article) Read() (*Article, error) {
 	if err != nil {
 		return nil, err
 	}
-	bbsRedis.Incr(information.TOTAL_READ_NUM)
+	storage.GetRedisPool().Incr(information.TOTAL_READ_NUM)
 	res.LabelList = new(Label).FindByArticleId(res.Id)
 	return res, err
 }
@@ -71,7 +70,7 @@ func (a *Article) createQsByParam() orm.QuerySeter {
 	return qs
 }
 
-var ORDER_BY_LIST = []string {
+var ORDER_BY_LIST = []string{
 	"update_time",
 	"create_time",
 	"read_count",
@@ -91,7 +90,7 @@ func (a *Article) Find(page *common.Page, orderIndex int32, isAsc bool, rangeTim
 	sql := a.createRawSql("a.id, a.title, a.category_id, a.user_id, a.status, a.support_count, a.read_count, a.create_time, a.update_time", rangeTime, labelIdList...)
 	sql.WriteString(" order by ")
 	// 防止错误索引
-	if orderIndex >= int32(len(ORDER_BY_LIST)) || orderIndex < 0{
+	if orderIndex >= int32(len(ORDER_BY_LIST)) || orderIndex < 0 {
 		orderIndex = 0
 	}
 
@@ -112,7 +111,7 @@ func (a *Article) Find(page *common.Page, orderIndex int32, isAsc bool, rangeTim
 	return res, err
 }
 
-func (a *Article) Count(rangeTime * common.RangeTime, labelIdList ...string) (int64, error) {
+func (a *Article) Count(rangeTime *common.RangeTime, labelIdList ...string) (int64, error) {
 	//qs := a.createQsByParam()
 	//return qs.Count()
 	var res int64
@@ -121,7 +120,7 @@ func (a *Article) Count(rangeTime * common.RangeTime, labelIdList ...string) (in
 	return res, err
 }
 
-func (a *Article) createRawSql(cols string, rangeTime * common.RangeTime, labelIdList ...string) *bytes.Buffer {
+func (a *Article) createRawSql(cols string, rangeTime *common.RangeTime, labelIdList ...string) *bytes.Buffer {
 	var sql = new(bytes.Buffer)
 	sql.WriteString("select ")
 	sql.WriteString(cols)
@@ -149,8 +148,7 @@ func (a *Article) createRawSql(cols string, rangeTime * common.RangeTime, labelI
 		sql.WriteString(strconv.FormatInt(a.Id, 10))
 	}
 
-
-	if a.CategoryId != 0{
+	if a.CategoryId != 0 {
 		sql.WriteString(" and a.category_id = ")
 		sql.WriteString(strconv.FormatInt(a.CategoryId, 10))
 	}
@@ -188,43 +186,42 @@ func (a *Article) Insert(labelIdList ...string) error {
 	if len(labelIdList) > 0 {
 		a.insertLabelArticle(labelIdList...)
 	}
-	bbsRedis.Incr(information.TOTAL_ARTICLE_NUM)
+	storage.GetRedisPool().Incr(information.TOTAL_ARTICLE_NUM)
 	return err
 }
-
 
 func (a *Article) Delete() error {
 	a.Status = -1
 	a.UpdateTime.Time = time.Now()
-	_, err := ORM.Update(a,"status")
+	_, err := ORM.Update(a, "status")
 	return err
 }
 
 func (a *Article) Update(labelIdList ...string) error {
 	var cols []string
 	if a.Id != 0 {
-		cols = append(cols,"id")
+		cols = append(cols, "id")
 	}
 	if a.Title != "" {
-		cols = append(cols,"title")
+		cols = append(cols, "title")
 	}
 	if a.UserId != 0 {
-		cols = append(cols,"user_id")
+		cols = append(cols, "user_id")
 	}
 	if a.Status != 0 {
-		cols = append(cols,"status")
+		cols = append(cols, "status")
 	}
 	if a.ReadCount != 0 {
-		cols = append(cols,"read_count")
+		cols = append(cols, "read_count")
 	}
 	if a.CategoryId != 0 {
-		cols = append(cols,"category_id")
+		cols = append(cols, "category_id")
 	}
 	if a.Content != "" {
-		cols = append(cols,"content")
+		cols = append(cols, "content")
 	}
 	if !a.UpdateTime.IsZero() {
-		cols = append(cols,"update_time")
+		cols = append(cols, "update_time")
 	}
 	_, err := ORM.Update(a, cols...)
 	if err != nil {

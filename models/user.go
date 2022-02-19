@@ -2,32 +2,32 @@ package models
 
 import (
 	"bbs-back/base/common"
-	"bbs-back/base/database/bbsRedis"
 	"bbs-back/base/dto/information"
+	"bbs-back/base/storage"
 	"github.com/beego/beego/v2/client/orm"
 	"strings"
 )
 
 type User struct {
-	Id int64				`json:"id" form:"id" orm:"pk"`
-	Name string				`json:"name" form:"name"`
-	Password string			`json:"password" form:"password"`
-	Account string			`json:"account" form:"account"`
-	Email string			`json:"email" form:"email"`
-	TelephoneNumber int64	`json:"telephoneNumber" form:"telephoneNumber"`
-	Age int32				`json:"age" form:"age"`
-	Status int32			`json:"status" form:"status"`
+	Id              int64  `json:"id" form:"id" orm:"pk"`
+	Name            string `json:"name" form:"name"`
+	Password        string `json:"password" form:"password"`
+	Account         string `json:"account" form:"account"`
+	Email           string `json:"email" form:"email"`
+	TelephoneNumber int64  `json:"telephoneNumber" form:"telephoneNumber"`
+	Age             int32  `json:"age" form:"age"`
+	Status          int32  `json:"status" form:"status"`
 	common.TimeModel
-	Role int32				`json:"role" form:"role"`
-	Gender string			`json:"gender" form:"gender"`
-	ImageUrl	string		`json:"imageUrl" form:"imageUrl"`
+	Role     int32  `json:"role" form:"role"`
+	Gender   string `json:"gender" form:"gender"`
+	ImageUrl string `json:"imageUrl" form:"imageUrl"`
 }
 
 const (
-	tableName = "user"
-	USER_STATUS_NORMAL = 1	//状态， 1-正常使用 2-已注销 3-黑名单
+	tableName                = "user"
+	USER_STATUS_NORMAL       = 1 //状态， 1-正常使用 2-已注销 3-黑名单
 	USER_STATUS_CANCELLATION = 2
-	USER_STATUS_BLACKLIST = 3
+	USER_STATUS_BLACKLIST    = 3
 	//	3 -超级管理员，2-管理员，1-普通用户
 	USER_ROLE_USER        = 1
 	USER_ROLE_ADMIN       = 2
@@ -46,17 +46,19 @@ func (u *User) FindOne() (*User, error) {
 	err := u.createQsByParam().One(res)
 	return res, err
 }
-var userOrderList = []string {
+
+var userOrderList = []string{
 	"update_time",
 	"create_time",
 }
+
 func (u *User) Find(page *common.Page, orderIndex int, isDesc bool, cols ...string) ([]*User, error) {
 	qs := u.createQsByParam()
 	if u.Id == 0 {
 		// 用户列表查询时超级管理员不对外暴露
 		qs = qs.Exclude("role", USER_ROLE_SUPER_ADMIN)
 	}
-	if orderIndex < 0 || orderIndex >= len(userOrderList){
+	if orderIndex < 0 || orderIndex >= len(userOrderList) {
 		orderIndex = 0
 	}
 	if isDesc {
@@ -129,7 +131,7 @@ func (u *User) Insert() error {
 	if err != nil {
 		return common.NewErrorWithCode(common.ERROR_DB_LIMIT, err.Error())
 	}
-	bbsRedis.Incr(information.TOTAL_USER_NUM)
+	storage.GetRedisPool().Incr(information.TOTAL_USER_NUM)
 	u.Id = id
 	return err
 }
@@ -179,7 +181,6 @@ func (u *User) Update() error {
 	_, err := ORM.Update(u, cols...)
 	return err
 }
-
 
 // 获取我关注者的列表
 func (u *User) FollowerList(cols ...string) []*User {
