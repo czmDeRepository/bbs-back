@@ -17,7 +17,7 @@ type CategoryController struct {
 func (controller *CategoryController) Get() {
 	id, err := controller.GetInt64(":id")
 	if err != nil {
-		controller.end(common.ErrorWithMe(err, "参数id解析错误"))
+		controller.end(common.ErrorWithMe("参数id解析错误"))
 		return
 	}
 	category := new(dao.Category)
@@ -73,7 +73,7 @@ func (controller *CategoryController) GetAll() {
 func (controller *CategoryController) Put() {
 	role := controller.getCurUserRole()
 	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
+		controller.end(common.ErrorDetail(common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
 	category := new(dao.Category)
@@ -99,7 +99,7 @@ func (controller *CategoryController) Post() {
 	role := controller.getCurUserRole()
 
 	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
+		controller.end(common.ErrorDetail(common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
 	category := new(dao.Category)
@@ -119,7 +119,7 @@ func (controller *CategoryController) Post() {
 func (controller *CategoryController) Delete() {
 	role := controller.getCurUserRole()
 	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
+		controller.end(common.ErrorDetail(common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
 	id, err := controller.GetInt64(":id")

@@ -7,6 +7,7 @@ import (
 	"bbs-back/base/common"
 	"bbs-back/base/dto"
 	"bbs-back/base/storage"
+	"bbs-back/base/util"
 	"bbs-back/models/dao"
 
 	beego "github.com/beego/beego/v2/server/web"
@@ -41,7 +42,7 @@ func (controller *UserController) Get() {
 	u.Id = id
 	res, err := u.Read()
 	if err != nil {
-		controller.end(common.Error(err.Error()))
+		controller.end(common.Error(err))
 	}
 	controller.end(common.SuccessWithData(res))
 }
@@ -66,7 +67,7 @@ func (controller *UserController) GetAll() {
 	if param.Id == 0 {
 		role := controller.getCurUserRole()
 		if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-			controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
+			controller.end(common.ErrorDetail(common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 			return
 		}
 	}
@@ -75,7 +76,7 @@ func (controller *UserController) GetAll() {
 	isDesc, _ := controller.GetBool("isDesc", false)
 	userList, err := param.User.Find(&param.Page, orderIndex, isDesc)
 	if err != nil {
-		controller.end(common.Error(err.Error()))
+		controller.end(common.Error(err))
 		return
 	}
 	total, _ := param.User.Count()
@@ -108,7 +109,7 @@ func (controller *UserController) Put() {
 	param := new(dao.User)
 	controller.ParseForm(param)
 	if param.Id == 0 {
-		controller.end(common.ErrorDetail(nil, common.ERROR_PARAM, "用户id为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "用户id为空"))
 		return
 	}
 	role := controller.getCurUserRole()
@@ -116,7 +117,7 @@ func (controller *UserController) Put() {
 	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		curUserId := controller.getCurUserId()
 		if curUserId != param.Id {
-			controller.end(common.ErrorDetail(nil, common.ERROR_CURRENT_USER, "不可修改其他用户信息！！！"))
+			controller.end(common.ErrorDetail(common.ERROR_CURRENT_USER, "不可修改其他用户信息！！！"))
 			return
 		}
 	}
@@ -182,7 +183,7 @@ func (controller *UserController) Post() {
 	u := new(dao.User)
 	controller.ParseForm(u)
 	if u.Name == "" || u.Account == "" || u.Account == "" {
-		controller.end(common.ErrorWithMe(nil, ""))
+		controller.end(common.ErrorWithMe("缺少必要参数"))
 	}
 	err := u.Insert()
 	if err != nil {
@@ -205,23 +206,34 @@ func (controller *UserController) Login() {
 	account := controller.GetString("account")
 	password := controller.GetString("password")
 	if account == "" || password == "" {
-		controller.end(common.ErrorWithMe(nil, "账号密码非空"))
+		controller.end(common.ErrorWithMe("账号密码非空"))
+		return
+	}
+	captcha := controller.GetString("captcha")
+	captchaKey := controller.GetString("captchaKey")
+	if captcha == "" || captchaKey == "" {
+		controller.end(common.ErrorWithMe("验证码非空"))
+		return
+	}
+	if err := util.VerifyCaptcha(captchaKey, captcha, true); err != nil {
+		controller.end(common.Error(err))
+		return
 	}
 	param := new(dao.User)
 	param.Account = account
 	param.Password = password
 	user, err := param.FindOne()
 	if err != nil {
-		controller.end(common.ErrorWithMe(err, "用户不存在或密码错误 "))
+		controller.end(common.ErrorWithMe("用户不存在或密码错误 "))
 		return
 	}
 
 	switch user.Status {
 	case dao.USER_STATUS_BLACKLIST:
-		controller.end(common.ErrorWithMe(nil, "您目前被限制登陆，请联系管理员解锁！！！"))
+		controller.end(common.ErrorWithMe("您目前被限制登陆，请联系管理员解锁！！！"))
 		return
 	case dao.USER_STATUS_CANCELLATION:
-		controller.end(common.ErrorWithMe(nil, "当前账号已注销！！！"))
+		controller.end(common.ErrorWithMe("当前账号已注销！！！"))
 		return
 	}
 
@@ -338,7 +350,7 @@ func (controller *UserController) FollowDelete() {
 	u.Id = id
 	err = u.UnFollower(targetId)
 	if err != nil {
-		controller.end(common.Error(err.Error()))
+		controller.end(common.Error(err))
 		return
 	}
 	controller.end(common.Success())

@@ -72,7 +72,7 @@ func (controller *LabelController) Put() {
 	role := controller.getCurUserRole()
 
 	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
+		controller.end(common.ErrorDetail(common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
 
@@ -83,7 +83,7 @@ func (controller *LabelController) Put() {
 		return
 	}
 	if label.Id == 0 {
-		controller.end(common.ErrorDetail(nil, common.ERROR_PARAM, "id不允许为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "id不允许为空"))
 		return
 	}
 	err = label.Update()
@@ -102,7 +102,7 @@ func (controller *LabelController) Post() {
 	role := controller.getCurUserRole()
 
 	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
+		controller.end(common.ErrorDetail(common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
 	label := new(dao.Label)
@@ -112,7 +112,7 @@ func (controller *LabelController) Post() {
 		return
 	}
 	if label.Name == "" {
-		controller.end(common.ErrorDetail(nil, common.ERROR_PARAM, "标签名都不允许为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "标签名都不允许为空"))
 		return
 	}
 	err = label.Insert()

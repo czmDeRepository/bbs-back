@@ -91,7 +91,7 @@ func (controller *CommentController) Put() {
 		return
 	}
 	if comment.Id == 0 || comment.Content == "" {
-		controller.end(common.ErrorDetail(nil, common.ERROR_PARAM, "id和评论内容都不允许为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "id和评论内容都不允许为空"))
 		return
 	}
 	// start 只允许修改自己评论
@@ -104,7 +104,7 @@ func (controller *CommentController) Put() {
 		return
 	}
 	if count == 0 {
-		controller.end(common.ErrorDetail(nil, common.ERROR_CURRENT_USER, "无法修改他人评论！"))
+		controller.end(common.ErrorDetail(common.ERROR_CURRENT_USER, "无法修改他人评论！"))
 		return
 	}
 	// end
@@ -136,7 +136,7 @@ func (controller *CommentController) Post() {
 		return
 	}
 	if comment.Content == "" || comment.ArticleId == 0 {
-		controller.end(common.ErrorDetail(nil, common.ERROR_PARAM, "评论内容或论贴id不允许为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "评论内容或论贴id不允许为空"))
 		return
 	}
 	comment.UserId = curUserId
@@ -178,7 +178,7 @@ func (controller *CommentController) Delete() {
 			return
 		}
 		if count == 0 {
-			controller.end(common.ErrorDetail(nil, common.ERROR_CURRENT_USER, common.ERROR_MESSAGE[common.ERROR_CURRENT_USER]))
+			controller.end(common.ErrorDetail(common.ERROR_CURRENT_USER, common.ERROR_MESSAGE[common.ERROR_CURRENT_USER]))
 			return
 		}
 		// end

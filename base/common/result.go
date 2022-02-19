@@ -43,25 +43,24 @@ func Success() (res Result) {
 	return SuccessWithData(nil)
 }
 
-func Error(data interface{}) (res Result) {
-	return ErrorDetail(data, FAIL, "")
+func Error(err error) (res Result) {
+	return ErrorDetail(FAIL, err.Error())
 }
 
 func ErrorMeWithCode(message string, errCode int32) Result {
-	return ErrorDetail(nil, errCode, message)
+	return ErrorDetail(errCode, message)
 }
 
-func ErrorWithCode(data interface{}, errCode int32) Result {
-	return ErrorDetail(data, errCode, ERROR_MESSAGE[errCode])
+func ErrorWithCode(errCode int32) Result {
+	return ErrorDetail(errCode, ERROR_MESSAGE[errCode])
 }
 
-func ErrorWithMe(data interface{}, message string) Result {
-	return ErrorDetail(data, FAIL, message)
+func ErrorWithMe(message string) Result {
+	return ErrorDetail(FAIL, message)
 }
 
-func ErrorDetail(data interface{}, errCode int32, message string) (res Result) {
+func ErrorDetail(errCode int32, message string) (res Result) {
 	res.Code = errCode
 	res.Message = message
-	res.Data = data
 	return res
 }

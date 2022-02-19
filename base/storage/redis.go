@@ -105,12 +105,12 @@ func (pool *RedisPool) Get(key string) (string, error) {
 redis EXPIRE
 */
 func (pool *RedisPool) Expire(key string, ex time.Duration) error {
-	_, err := redisPool.do("EXPIRE", key, ex)
+	_, err := redisPool.do("EXPIRE", key, ex.Seconds())
 	return err
 }
 
 func (pool *RedisPool) SetExp(key, v string, ex time.Duration) error {
-	_, err := redisPool.do("SET", key, v, "EX", ex)
+	_, err := redisPool.do("SET", key, v, "EX", ex.Seconds())
 	return err
 }
 

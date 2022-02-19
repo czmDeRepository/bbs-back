@@ -22,5 +22,5 @@ func HandleError(err error) Result {
 	if ok {
 		return ErrorMeWithCode(bbsError.Error(), bbsError.ErrorCode)
 	}
-	return Error(err.Error())
+	return Error(err)
 }

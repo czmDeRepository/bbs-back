@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+
 	"bbs-back/base/common"
 
 	beego "github.com/beego/beego/v2/server/web"
@@ -16,13 +18,13 @@ func init() {
 }
 
 func (controller *ErrorController) Error404() {
-	controller.end(common.ErrorWithCode(nil, 404))
+	controller.end(common.ErrorWithCode(404))
 }
 
 func (controller *ErrorController) Error500() {
-	controller.end(common.Error(nil))
+	controller.end(common.Error(errors.New("系统错误！！")))
 }
 
 func (controller *ErrorController) ErrorDb() {
-	controller.end(common.ErrorWithMe(nil, "database is now down"))
+	controller.end(common.ErrorWithMe("database is now down"))
 }

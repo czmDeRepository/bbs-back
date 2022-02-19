@@ -20,7 +20,7 @@ type ArticleController struct {
 func (controller *ArticleController) Get() {
 	id, err := controller.GetInt64(":id")
 	if err != nil {
-		controller.end(common.ErrorWithMe(err, "id不为空"))
+		controller.end(common.ErrorWithMe("id不为空"))
 		return
 	}
 	article := new(dao.Article)
@@ -140,7 +140,7 @@ func (controller *ArticleController) Post() {
 func (controller *ArticleController) Delete() {
 	id, err := controller.GetInt64("id")
 	if err != nil {
-		controller.end(common.ErrorWithMe(err, "id不为空"))
+		controller.end(common.ErrorWithMe("id不为空"))
 		return
 	}
 	userId := controller.getCurUserId()
@@ -149,9 +149,9 @@ func (controller *ArticleController) Delete() {
 	article.Id = id
 	if role == dao.USER_ROLE_USER {
 		article.UserId = userId
-		count, err := article.Count(nil)
+		count, _ := article.Count(nil)
 		if count == 0 {
-			controller.end(common.ErrorWithMe(err, "非法删除他人帖子"))
+			controller.end(common.ErrorWithMe("非法删除他人帖子"))
 			return
 		}
 	}
@@ -170,7 +170,7 @@ func (controller *ArticleController) Delete() {
 func (controller *ArticleController) Follow() {
 	articleId, err := controller.GetInt64("articleId")
 	if err != nil {
-		controller.end(common.ErrorDetail(err, common.ERROR_PARAM, "论贴id不为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "论贴id不为空"))
 		return
 	}
 	userId := controller.getCurUserId()
@@ -191,7 +191,7 @@ func (controller *ArticleController) Follow() {
 func (controller *ArticleController) UnFollow() {
 	articleId, err := controller.GetInt64("articleId")
 	if err != nil {
-		controller.end(common.ErrorDetail(err, common.ERROR_PARAM, "论贴id不为空"))
+		controller.end(common.ErrorDetail(common.ERROR_PARAM, "论贴id不为空"))
 		return
 	}
 	userId := controller.getCurUserId()

@@ -19,7 +19,7 @@ func Filter(ctx *context.Context) {
 	//	token := request.Header.Get("token")
 	//	if token == "" {
 	//		//http.Error(ctx.ResponseWriter, "Method Not Allowed", http.StatusForbidden)
-	//		ctx.Output.JSON(common.ErrorDetail(nil, common.ERROR_TOKEN_NOEXIST, common.ERROR_MESSAGE[common.ERROR_TOKEN_NOEXIST]), beego.BConfig.RunMode != beego.PROD, false)
+	//		ctx.Output.JSON(common.ErrorDetail(common.ERROR_TOKEN_NOEXIST, common.ERROR_MESSAGE[common.ERROR_TOKEN_NOEXIST]), beego.BConfig.RunMode != beego.PROD, false)
 	//		return
 	//	}
 	//	log.Println("过滤器：toekn", token)
@@ -69,6 +69,6 @@ func RecoverPanic(ctx *context.Context, cfg *beego.Config) {
 			}
 			logs.Critical(fmt.Sprintf("%s:%d", file, line))
 		}
-		ctx.Output.JSON(common.ErrorWithMe(err.(error).Error(), "未知异常！！！"), beego.BConfig.RunMode != beego.PROD, false)
+		ctx.Output.JSON(common.ErrorWithMe("未知异常！！！:"+err.(error).Error()), beego.BConfig.RunMode != beego.PROD, false)
 	}
 }
