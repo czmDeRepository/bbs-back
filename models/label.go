@@ -2,15 +2,11 @@ package models
 
 import (
 	"bbs-back/base/common"
+	"bbs-back/models/entity"
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Label struct {
-	Id     int64  `json:"id" form:"id" orm:"pk"`
-	Name   string `json:"name" form:"name"`
-	Status int32  `json:"status" form:"status"`
-	common.TimeModel
-}
+type Label entity.Label
 
 func (l *Label) Read() (*Label, error) {
 	res := new(Label)

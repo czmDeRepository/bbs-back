@@ -2,33 +2,23 @@ package models
 
 import (
 	"bbs-back/base/common"
+	"bbs-back/models/entity"
 	"bytes"
 	"strconv"
 )
 
 type Comment struct {
-	Id				int64	`json:"id" form:"id" orm:"pk"`
-	// 主论贴id
-	ArticleId	    int64 `json:"articleId" form:"articleId"`
-	// 评论者id
-	UserId 			int64	`json:"userId" form:"userId"`
-	// 被回复者id
-	RepliedUserId	int64	`json:"repliedUserId" form:"repliedUserId"`
-	Status			int32	`json:"status" form:"status"`
-	Content			string	`json:"content" form:"content"`
-	// 父级评论id
-	CommentId		int64	`json:"commentId" form:"commentId"`
-	common.TimeModel
+	entity.Comment
 	// 评论者用户名
-	UserName		string	`json:"userName"`
+	UserName string `json:"userName"`
 	// 评论者性别
-	UserGender			string	`json:"userGender"`
+	UserGender string `json:"userGender"`
 	//	评论者用户头像路径
-	UserImageUrl	string	`json:"userImageUrl"`
+	UserImageUrl string `json:"userImageUrl"`
 	// 被回复者用户名
-	RepliedUserName string	`json:"repliedUserName"`
+	RepliedUserName string `json:"repliedUserName"`
 	// 被回复者用户头像
-	RepliedUserImageUrl	string	`json:"repliedUserImageUrl"`
+	RepliedUserImageUrl string `json:"repliedUserImageUrl"`
 	//RepliedUserGender			string	`json:"repliedUserGender"`
 	// 子回复数组
 	ChildrenList []*Comment `json:"childrenList" orm:"-"`
@@ -44,15 +34,15 @@ func (c *Comment) Insert() error {
 	c.CreateTime = *common.Now()
 	_, err := ORM.Raw("insert into comment (article_id, user_id, replied_user_id, create_time, update_time, content, status, comment_id) values (?, ?, ?, ?, ?, ?, ?, ?)",
 		c.ArticleId, c.UserId, c.RepliedUserId, c.CreateTime.Time, c.CreateTime.Time, c.Content, c.Status, c.CommentId,
-		).Exec()
+	).Exec()
 	return err
 }
 
 func (c *Comment) Read() (*Comment, error) {
 	var comment = new(Comment)
-	err := ORM.Raw("select c.*, u.`name` user_name, u.`image_url` user_image_url, u.gender user_gender, u2.name replied_user_name, u2.`image_url` replied_user_image_url " +
-		"from `comment` c inner join `user` u on c.user_id = u.id " +
-		"left join `user` u2 on c.replied_user_id = u2.id  " +
+	err := ORM.Raw("select c.*, u.`name` user_name, u.`image_url` user_image_url, u.gender user_gender, u2.name replied_user_name, u2.`image_url` replied_user_image_url "+
+		"from `comment` c inner join `user` u on c.user_id = u.id "+
+		"left join `user` u2 on c.replied_user_id = u2.id  "+
 		"where c.id = ?", c.Id).QueryRow(comment)
 	return comment, err
 }
@@ -83,11 +73,11 @@ func (c *Comment) Find(page *common.Page, desc bool) ([]*Comment, error) {
 	}
 	if c.RepliedUserId != 0 {
 		sql.WriteString(" and c.replied_user_id = ")
-		sql.WriteString(strconv.FormatInt(c.RepliedUserId,10))
+		sql.WriteString(strconv.FormatInt(c.RepliedUserId, 10))
 	}
 	if c.CommentId != 0 {
 		sql.WriteString(" and c.comment_id = ")
-		sql.WriteString(strconv.FormatInt(c.CommentId,10))
+		sql.WriteString(strconv.FormatInt(c.CommentId, 10))
 	}
 	sql.WriteString(" order by c.create_time ")
 	if desc {

@@ -2,15 +2,11 @@ package models
 
 import (
 	"bbs-back/base/common"
+	"bbs-back/models/entity"
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Category struct {
-	Id   int64  `json:"id" form:"id" orm:"pk"`
-	Name string `json:"name" form:"name"`
-	common.TimeModel
-}
-
+type Category entity.Category
 
 func (c *Category) Insert() error {
 	// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
@@ -29,10 +25,12 @@ func (c *Category) Read() (*Category, error) {
 	err := ORM.Read(res)
 	return res, err
 }
-var categoryOrderList = []string {
+
+var categoryOrderList = []string{
 	"update_time",
 	"create_time",
 }
+
 func (c *Category) Find(page *common.Page, orderIndex int, isDesc bool, cols ...string) ([]*Category, error) {
 	var qs orm.QuerySeter
 	if page == nil || !page.NeedPage() {
@@ -41,7 +39,7 @@ func (c *Category) Find(page *common.Page, orderIndex int, isDesc bool, cols ...
 		qs = c.createQsByParam().Limit(page.GetPageSize(), page.GetOffset())
 	}
 	// 防止错误索引
-	if orderIndex >= len(categoryOrderList) || orderIndex < 0{
+	if orderIndex >= len(categoryOrderList) || orderIndex < 0 {
 		orderIndex = 0
 	}
 	if isDesc {
