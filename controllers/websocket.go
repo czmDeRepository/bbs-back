@@ -1,12 +1,12 @@
 package controllers
 
-import "C"
 import (
-	"bbs-back/models/chat"
-	"bbs-back/models/dao"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"bbs-back/models/chat"
+	"bbs-back/models/dao"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/websocket"

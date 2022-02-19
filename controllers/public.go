@@ -1,12 +1,6 @@
 package controllers
 
 import (
-	"bbs-back/base/baseconf"
-	"bbs-back/base/common"
-	"bbs-back/base/dto/information"
-	"bbs-back/base/enum"
-	"bbs-back/base/storage"
-	"bbs-back/models/chat"
 	"bufio"
 	"crypto/md5"
 	"fmt"
@@ -14,6 +8,13 @@ import (
 	"os"
 	"path"
 	"strconv"
+
+	"bbs-back/base/baseconf"
+	"bbs-back/base/common"
+	"bbs-back/base/dto/information"
+	"bbs-back/base/enum"
+	"bbs-back/base/storage"
+	"bbs-back/models/chat"
 
 	beego "github.com/beego/beego/v2/server/web"
 )
