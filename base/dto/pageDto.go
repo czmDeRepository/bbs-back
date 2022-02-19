@@ -2,33 +2,33 @@ package dto
 
 import (
 	"bbs-back/base/common"
-	"bbs-back/models"
+	"bbs-back/models/dao"
 )
 
 type UserDto struct {
-	models.User
+	dao.User
 	common.PageDto
 }
 
 type CategoryDto struct {
-	models.Category
+	dao.Category
 	common.PageDto
 }
 
 type ArticleDto struct {
-	models.Article
+	dao.Article
 	common.PageDto
-	IsAsc		bool	`json:"isAsc,omitempty" form:"isAsc"`
-	OrderIndex	int32	`json:"orderIndex,omitempty" form:"orderIndex"`
+	IsAsc      bool  `json:"isAsc,omitempty" form:"isAsc"`
+	OrderIndex int32 `json:"orderIndex,omitempty" form:"orderIndex"`
 	common.RangeTime
 }
 
 type LabelDto struct {
-	models.Label
+	dao.Label
 	common.PageDto
 }
 
 type CommentDto struct {
-	models.Comment
+	dao.Comment
 	common.PageDto
 }

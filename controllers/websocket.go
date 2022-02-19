@@ -2,13 +2,14 @@ package controllers
 
 import "C"
 import (
-	"bbs-back/models"
 	"bbs-back/models/chat"
+	"bbs-back/models/dao"
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"strconv"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/websocket"
 )
 
 type WebSocketController struct {
@@ -17,7 +18,7 @@ type WebSocketController struct {
 
 var upgrader *websocket.Upgrader
 
-func init()  {
+func init() {
 	upgrader = new(websocket.Upgrader)
 	// 跨域
 	upgrader.CheckOrigin = func(_ *http.Request) bool {
@@ -33,7 +34,7 @@ func (controller *WebSocketController) Join() {
 	token := controller.GetString("token")
 	parseToken, err := ValidateToken(token)
 	if err != nil {
-		http.Error(controller.Ctx.ResponseWriter, "token解析出错！！!" + err.Error(), http.StatusBadRequest)
+		http.Error(controller.Ctx.ResponseWriter, "token解析出错！！!"+err.Error(), http.StatusBadRequest)
 		return
 	}
 	userId := checkIsOnLineUser(parseToken.Claims.(jwt.MapClaims))
@@ -43,9 +44,9 @@ func (controller *WebSocketController) Join() {
 		http.Error(controller.Ctx.ResponseWriter, "请使用websocket连接！！！", http.StatusBadRequest)
 		return
 	}
-	id , _ := strconv.ParseInt(userId, 10, 64)
-	user := new(models.User)
-	user.Id= id
+	id, _ := strconv.ParseInt(userId, 10, 64)
+	user := new(dao.User)
+	user.Id = id
 	user, _ = user.Read()
 	user.Password = ""
 	sub := chat.Join(0, user, ws)

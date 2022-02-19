@@ -1,5 +1,5 @@
 package util
 
-func Copy(src, target interface{})  {
+func Copy(src, target interface{}) {
 
 }

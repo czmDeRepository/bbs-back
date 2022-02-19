@@ -1,8 +1,9 @@
-package models
+package dao
 
 import (
 	"bbs-back/base/common"
 	"bbs-back/models/entity"
+
 	"github.com/beego/beego/v2/client/orm"
 )
 

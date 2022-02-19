@@ -5,6 +5,7 @@ import (
 	"bbs-back/base/handler"
 	"bbs-back/models"
 	_ "bbs-back/routers"
+
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/filter/cors"
 )

@@ -1,10 +1,12 @@
 package chat
 
 import (
-	"bbs-back/models"
+	"time"
+
+	"bbs-back/models/dao"
+
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/gorilla/websocket"
-	"time"
 )
 
 const (
@@ -22,12 +24,12 @@ const (
 type EventType int
 
 type Event struct {
-	CategoryId int64        `json:"categoryId"` // 主题id
-	Type       EventType    `json:"type"`       // JOIN, LEAVE, MESSAGE
-	User       *models.User `json:"user"`
-	Timestamp  int          `json:"timestamp"`
-	Content    *Content     `json:"content"`
-	OnLineNum  int64          `json:"onLineNum"`
+	CategoryId int64     `json:"categoryId"` // 主题id
+	Type       EventType `json:"type"`       // JOIN, LEAVE, MESSAGE
+	User       *dao.User `json:"user"`
+	Timestamp  int       `json:"timestamp"`
+	Content    *Content  `json:"content"`
+	OnLineNum  int64     `json:"onLineNum"`
 }
 
 type MessageType int
@@ -36,11 +38,11 @@ type Content struct {
 	CategoryIdList []int64     `json:"categoryIdList"`
 	Type           MessageType `json:"type"`
 	Message        string      `json:"message"`
-	NewCategoryId	int64		`json:"newCategoryId"`
+	NewCategoryId  int64       `json:"newCategoryId"`
 }
 
 type Subscribe struct {
-	User       *models.User
+	User       *dao.User
 	Ws         *websocket.Conn
 	CategoryId int64
 }
@@ -68,11 +70,11 @@ func OnLineNum() int64 {
 	return res
 }
 
-func NewEvent(categoryId int64, ep EventType, user *models.User, content *Content) *Event {
+func NewEvent(categoryId int64, ep EventType, user *dao.User, content *Content) *Event {
 	return &Event{categoryId, ep, user, int(time.Now().Unix()), content, 0}
 }
 
-func Join(categoryId int64, user *models.User, ws *websocket.Conn) *Subscribe {
+func Join(categoryId int64, user *dao.User, ws *websocket.Conn) *Subscribe {
 	sub := &Subscribe{CategoryId: categoryId, User: user, Ws: ws}
 	subscribe <- sub
 	return sub
@@ -82,7 +84,7 @@ func Leave(sub *Subscribe) {
 	unsubscribe <- sub
 }
 
-func addSubscribe(sub *Subscribe, isJoin bool)  {
+func addSubscribe(sub *Subscribe, isJoin bool) {
 	if subscribersMap[sub.CategoryId] == nil {
 		subscribersMap[sub.CategoryId] = map[int64]*Subscribe{}
 	} else if subscribersMap[sub.CategoryId][sub.User.Id] != nil {

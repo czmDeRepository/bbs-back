@@ -1,14 +1,16 @@
-package models
+package dao
 
 import (
+	"bytes"
+	"strconv"
+	"time"
+
 	"bbs-back/base/common"
 	"bbs-back/base/dto/information"
 	"bbs-back/base/storage"
 	"bbs-back/models/entity"
-	"bytes"
+
 	"github.com/beego/beego/v2/client/orm"
-	"strconv"
-	"time"
 )
 
 type Article struct {

@@ -3,7 +3,7 @@ package controllers
 import (
 	"bbs-back/base/common"
 	"bbs-back/base/dto"
-	"bbs-back/models"
+	"bbs-back/models/dao"
 )
 
 type CategoryController struct {
@@ -14,13 +14,13 @@ type CategoryController struct {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/:id [get]
-func (controller *CategoryController) Get()  {
+func (controller *CategoryController) Get() {
 	id, err := controller.GetInt64(":id")
 	if err != nil {
-		controller.end(common.ErrorWithMe(err,"参数id解析错误"))
+		controller.end(common.ErrorWithMe(err, "参数id解析错误"))
 		return
 	}
-	category := new(models.Category)
+	category := new(dao.Category)
 	category.Id = id
 	res, err := category.Read()
 	if err != nil {
@@ -70,13 +70,13 @@ func (controller *CategoryController) GetAll() {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [put]
-func (controller *CategoryController) Put()  {
+func (controller *CategoryController) Put() {
 	role := controller.getCurUserRole()
-	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN  {
+	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
-	category := new(models.Category)
+	category := new(dao.Category)
 	err := controller.ParseForm(category)
 	if err != nil {
 		controller.paramError(common.NewError(err.Error()))
@@ -95,14 +95,14 @@ func (controller *CategoryController) Put()  {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [post]
-func (controller *CategoryController) Post()  {
+func (controller *CategoryController) Post() {
 	role := controller.getCurUserRole()
 
-	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN  {
+	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
-	category := new(models.Category)
+	category := new(dao.Category)
 	controller.ParseForm(category)
 	err := category.Insert()
 	if err != nil {
@@ -116,9 +116,9 @@ func (controller *CategoryController) Post()  {
 // @Success 200 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/:id [delete]
-func (controller *CategoryController) Delete()  {
+func (controller *CategoryController) Delete() {
 	role := controller.getCurUserRole()
-	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN  {
+	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
@@ -127,7 +127,7 @@ func (controller *CategoryController) Delete()  {
 		controller.paramError(common.NewError(err.Error()))
 		return
 	}
-	category := new(models.Category)
+	category := new(dao.Category)
 	category.Id = id
 	_, err = category.Delete()
 	if err != nil {

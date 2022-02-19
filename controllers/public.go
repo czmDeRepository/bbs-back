@@ -10,11 +10,12 @@ import (
 	"bufio"
 	"crypto/md5"
 	"fmt"
-	beego "github.com/beego/beego/v2/server/web"
 	"log"
 	"os"
 	"path"
 	"strconv"
+
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 type PublicController struct {

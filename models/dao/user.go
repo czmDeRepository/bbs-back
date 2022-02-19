@@ -1,12 +1,14 @@
-package models
+package dao
 
 import (
+	"strings"
+
 	"bbs-back/base/common"
 	"bbs-back/base/dto/information"
 	"bbs-back/base/storage"
 	"bbs-back/models/entity"
+
 	"github.com/beego/beego/v2/client/orm"
-	"strings"
 )
 
 type User entity.User

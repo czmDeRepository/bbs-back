@@ -3,7 +3,7 @@ package controllers
 import (
 	"bbs-back/base/common"
 	"bbs-back/base/dto"
-	"bbs-back/models"
+	"bbs-back/models/dao"
 )
 
 type CommentController struct {
@@ -14,13 +14,13 @@ type CommentController struct {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/:id [get]
-func (controller *CommentController) Get()  {
+func (controller *CommentController) Get() {
 	id, err := controller.GetInt64(":id")
 	if err != nil {
 		controller.paramError(err)
 		return
 	}
-	comment := new(models.Comment)
+	comment := new(dao.Comment)
 	comment.Id = id
 	res, err := comment.Read()
 	if err != nil {
@@ -58,7 +58,7 @@ func (controller *CommentController) GetAll() {
 	isDetail, _ := controller.GetBool("isDetail", true)
 	// 查询子回复
 	if isDetail {
-		m := new(models.Comment)
+		m := new(dao.Comment)
 		notPage := common.NewNotPage()
 		for _, item := range list {
 			m.CommentId = item.Id
@@ -82,9 +82,9 @@ func (controller *CommentController) GetAll() {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [put]
-func (controller *CommentController) Put()  {
+func (controller *CommentController) Put() {
 	curUserId := controller.getCurUserId()
-	comment := new(models.Comment)
+	comment := new(dao.Comment)
 	err := controller.ParseForm(comment)
 	if err != nil {
 		controller.paramError(err)
@@ -95,7 +95,7 @@ func (controller *CommentController) Put()  {
 		return
 	}
 	// start 只允许修改自己评论
-	param := new(models.Comment)
+	param := new(dao.Comment)
 	param.Id = comment.Id
 	param.UserId = curUserId
 	count, err := param.Count()
@@ -126,10 +126,10 @@ func (controller *CommentController) Put()  {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [post]
-func (controller *CommentController) Post()  {
+func (controller *CommentController) Post() {
 	curUserId := controller.getCurUserId()
 
-	comment := new(models.Comment)
+	comment := new(dao.Comment)
 	err := controller.ParseForm(comment)
 	if err != nil {
 		controller.paramError(err)
@@ -155,21 +155,21 @@ func (controller *CommentController) Post()  {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [delete]
-func (controller *CommentController) Delete()  {
+func (controller *CommentController) Delete() {
 	curUserId := controller.getCurUserId()
 	curUserRole := controller.getCurUserRole()
 
-	param := new(models.Comment)
+	param := new(dao.Comment)
 	controller.ParseForm(param)
 	if param.Id == 0 {
 		controller.paramError(common.NewError("id非空！！！"))
 		return
 	}
-	comment := new(models.Comment)
+	comment := new(dao.Comment)
 	comment.Id = param.Id
 	// 回复消息须带上
 	comment.RepliedUserId = param.RepliedUserId
-	if curUserRole != models.USER_ROLE_ADMIN && curUserRole != models.USER_ROLE_SUPER_ADMIN {
+	if curUserRole != dao.USER_ROLE_ADMIN && curUserRole != dao.USER_ROLE_SUPER_ADMIN {
 		// start 普通用户只允许删除自己评论
 		comment.UserId = curUserId
 		count, err := comment.Count()
@@ -195,13 +195,13 @@ func (controller *CommentController) Delete()  {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/count/:articleId [get]
-func (controller *CommentController) GetCountByArticleId()  {
+func (controller *CommentController) GetCountByArticleId() {
 	articleId, err := controller.GetInt64(":articleId")
 	if err != nil {
 		controller.paramError(err)
 		return
 	}
-	comment := new(models.Comment)
+	comment := new(dao.Comment)
 	comment.ArticleId = articleId
 	count, err := comment.Count()
 	if err != nil {

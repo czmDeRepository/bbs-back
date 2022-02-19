@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"bbs-back/base/common"
-	"bbs-back/base/dto"
-	"bbs-back/models"
 	"strings"
 	"time"
+
+	"bbs-back/base/common"
+	"bbs-back/base/dto"
+	"bbs-back/models/dao"
 )
 
 type ArticleController struct {
@@ -16,13 +17,13 @@ type ArticleController struct {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/:id [get]
-func (controller *ArticleController) Get()  {
+func (controller *ArticleController) Get() {
 	id, err := controller.GetInt64(":id")
 	if err != nil {
-		controller.end(common.ErrorWithMe(err,"id不为空"))
+		controller.end(common.ErrorWithMe(err, "id不为空"))
 		return
 	}
-	article := new(models.Article)
+	article := new(dao.Article)
 	article.Id = id
 	res, err := article.Read()
 	if err != nil {
@@ -31,12 +32,11 @@ func (controller *ArticleController) Get()  {
 	}
 	userId, err := controller.GetInt64("userId")
 	if err == nil {
-		res.FollowingFlag =  res.FollowingCount(userId) > 0
+		res.FollowingFlag = res.FollowingCount(userId) > 0
 	}
 	res.FollowCount = res.FollowingCount()
 	controller.end(common.SuccessWithData(res))
 }
-
 
 // @Title GetAll
 // @Param	title			query	string	false  	"论贴标题"
@@ -69,7 +69,7 @@ func (controller *ArticleController) GetAll() {
 		controller.end(common.HandleError(err))
 		return
 	}
-	for _,item := range list {
+	for _, item := range list {
 		item.FollowCount = item.FollowingCount()
 	}
 	total, _ := article.Article.Count(&article.RangeTime, labelIdListParam...)
@@ -88,8 +88,8 @@ func (controller *ArticleController) GetAll() {
 //@Success 0 {object} dto.Result
 //@Failure 1000 :参数错误
 // @router	/ [put]
-func (controller *ArticleController) Put()  {
-	article := new(models.Article)
+func (controller *ArticleController) Put() {
+	article := new(dao.Article)
 	controller.ParseForm(article)
 	if article.Id == 0 {
 		controller.paramError(common.NewError("id不为空"))
@@ -113,8 +113,8 @@ func (controller *ArticleController) Put()  {
 //@Success 0 {object} dto.Result
 //@Failure 1000 :参数错误
 // @router	/ [post]
-func (controller *ArticleController) Post()  {
-	article := new(models.Article)
+func (controller *ArticleController) Post() {
+	article := new(dao.Article)
 	curUserId := controller.getCurUserId()
 	labelStrings := controller.GetString("labelList")
 	controller.ParseForm(article)
@@ -137,21 +137,21 @@ func (controller *ArticleController) Post()  {
 //@Success 0 {object} dto.Result
 //@Failure 1000 :参数错误
 // @router	/ [delete]
-func (controller *ArticleController) Delete()  {
+func (controller *ArticleController) Delete() {
 	id, err := controller.GetInt64("id")
 	if err != nil {
-		controller.end(common.ErrorWithMe(err,"id不为空"))
+		controller.end(common.ErrorWithMe(err, "id不为空"))
 		return
 	}
 	userId := controller.getCurUserId()
 	role := controller.getCurUserRole()
-	article := new(models.Article)
+	article := new(dao.Article)
 	article.Id = id
-	if role == models.USER_ROLE_USER {
+	if role == dao.USER_ROLE_USER {
 		article.UserId = userId
 		count, err := article.Count(nil)
 		if count == 0 {
-			controller.end(common.ErrorWithMe(err,"非法删除他人帖子"))
+			controller.end(common.ErrorWithMe(err, "非法删除他人帖子"))
 			return
 		}
 	}
@@ -162,7 +162,6 @@ func (controller *ArticleController) Delete()  {
 	}
 	controller.end(common.Success())
 }
-
 
 // @Param	articleId			body	int64	true  	"论贴id"
 //@Success 0 {object} dto.Result
@@ -175,7 +174,7 @@ func (controller *ArticleController) Follow() {
 		return
 	}
 	userId := controller.getCurUserId()
-	article := new(models.Article)
+	article := new(dao.Article)
 	article.Id = articleId
 	err = article.Follow(userId)
 	if err != nil {
@@ -196,7 +195,7 @@ func (controller *ArticleController) UnFollow() {
 		return
 	}
 	userId := controller.getCurUserId()
-	article := new(models.Article)
+	article := new(dao.Article)
 	article.Id = articleId
 	err = article.UnFollow(userId)
 	if err != nil {
@@ -205,4 +204,3 @@ func (controller *ArticleController) UnFollow() {
 	}
 	controller.end(common.Success())
 }
-

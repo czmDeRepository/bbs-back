@@ -1,8 +1,9 @@
 package baseconf
 
 import (
-	beego "github.com/beego/beego/v2/server/web"
 	"log"
+
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 // 文件限制大小

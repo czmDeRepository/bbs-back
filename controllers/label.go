@@ -3,7 +3,7 @@ package controllers
 import (
 	"bbs-back/base/common"
 	"bbs-back/base/dto"
-	"bbs-back/models"
+	"bbs-back/models/dao"
 )
 
 type LabelController struct {
@@ -14,13 +14,13 @@ type LabelController struct {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/:id [get]
-func (controller *LabelController) Get()  {
+func (controller *LabelController) Get() {
 	id, err := controller.GetInt64(":id")
 	if err != nil {
 		controller.paramError(err)
 		return
 	}
-	label := new(models.Label)
+	label := new(dao.Label)
 	label.Id = id
 	res, err := label.Read()
 	if err != nil {
@@ -68,15 +68,15 @@ func (controller *LabelController) GetAll() {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [put]
-func (controller *LabelController) Put()  {
+func (controller *LabelController) Put() {
 	role := controller.getCurUserRole()
 
-	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN  {
+	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
 
-	label := new(models.Label)
+	label := new(dao.Label)
 	err := controller.ParseForm(label)
 	if err != nil {
 		controller.paramError(err)
@@ -98,14 +98,14 @@ func (controller *LabelController) Put()  {
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [post]
-func (controller *LabelController) Post()  {
+func (controller *LabelController) Post() {
 	role := controller.getCurUserRole()
 
-	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN  {
+	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 		return
 	}
-	label := new(models.Label)
+	label := new(dao.Label)
 	err := controller.ParseForm(label)
 	if err != nil {
 		controller.paramError(err)
@@ -122,4 +122,3 @@ func (controller *LabelController) Post()  {
 	}
 	controller.end(common.Success())
 }
-

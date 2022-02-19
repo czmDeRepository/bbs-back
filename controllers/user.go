@@ -4,11 +4,12 @@ import (
 	"bbs-back/base/common"
 	"bbs-back/base/dto"
 	"bbs-back/base/storage"
-	"bbs-back/models"
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/dgrijalva/jwt-go"
+	"bbs-back/models/dao"
 	"strconv"
 	"time"
+
+	beego "github.com/beego/beego/v2/server/web"
+	"github.com/dgrijalva/jwt-go"
 )
 
 // Operations about Users
@@ -35,7 +36,7 @@ func (controller *UserController) Get() {
 		controller.end(common.ErrorMeWithCode(common.ERROR_MESSAGE[common.ERROR_CURRENT_USER], common.ERROR_CURRENT_USER))
 		return
 	}
-	u := new(models.User)
+	u := new(dao.User)
 	u.Id = id
 	res, err := u.Read()
 	if err != nil {
@@ -63,7 +64,7 @@ func (controller *UserController) GetAll() {
 	// 多用户获取需要权限
 	if param.Id == 0 {
 		role := controller.getCurUserRole()
-		if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN {
+		if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 			controller.end(common.ErrorDetail(nil, common.ERROR_POWER, common.ERROR_MESSAGE[common.ERROR_POWER]))
 			return
 		}
@@ -103,7 +104,7 @@ func (controller *UserController) GetAll() {
 // @router	/ [put]
 func (controller *UserController) Put() {
 
-	param := new(models.User)
+	param := new(dao.User)
 	controller.ParseForm(param)
 	if param.Id == 0 {
 		controller.end(common.ErrorDetail(nil, common.ERROR_PARAM, "用户id为空"))
@@ -111,7 +112,7 @@ func (controller *UserController) Put() {
 	}
 	role := controller.getCurUserRole()
 
-	if role != models.USER_ROLE_ADMIN && role != models.USER_ROLE_SUPER_ADMIN {
+	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
 		curUserId := controller.getCurUserId()
 		if curUserId != param.Id {
 			controller.end(common.ErrorDetail(nil, common.ERROR_CURRENT_USER, "不可修改其他用户信息！！！"))
@@ -139,7 +140,7 @@ func (controller *UserController) Put() {
 // @Failure 403 :pageNum or pageSize is empty
 // @router	/ [delete]
 func (controller *UserController) Delete() {
-	u := new(models.User)
+	u := new(dao.User)
 	id, err := controller.GetInt64("id")
 	if err != nil {
 		controller.end(common.ErrorMeWithCode(err.Error(), common.ERROR_PARAM))
@@ -177,7 +178,7 @@ func init() {
 // @Success 200 {object} dto.Result
 // @router	/ [post]
 func (controller *UserController) Post() {
-	u := new(models.User)
+	u := new(dao.User)
 	controller.ParseForm(u)
 	if u.Name == "" || u.Account == "" || u.Account == "" {
 		controller.end(common.ErrorWithMe(nil, ""))
@@ -205,7 +206,7 @@ func (controller *UserController) Login() {
 	if account == "" || password == "" {
 		controller.end(common.ErrorWithMe(nil, "账号密码非空"))
 	}
-	param := new(models.User)
+	param := new(dao.User)
 	param.Account = account
 	param.Password = password
 	user, err := param.FindOne()
@@ -215,10 +216,10 @@ func (controller *UserController) Login() {
 	}
 
 	switch user.Status {
-	case models.USER_STATUS_BLACKLIST:
+	case dao.USER_STATUS_BLACKLIST:
 		controller.end(common.ErrorWithMe(nil, "您目前被限制登陆，请联系管理员解锁！！！"))
 		return
-	case models.USER_STATUS_CANCELLATION:
+	case dao.USER_STATUS_CANCELLATION:
 		controller.end(common.ErrorWithMe(nil, "当前账号已注销！！！"))
 		return
 	}
@@ -232,7 +233,7 @@ func (controller *UserController) Login() {
 	controller.end(common.SuccessWithData(tokenString))
 }
 
-func createToken(user *models.User) (string, int64, error) {
+func createToken(user *dao.User) (string, int64, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	// 一天过期
@@ -253,9 +254,9 @@ func createToken(user *models.User) (string, int64, error) {
 // @router /refresh [put]
 func (controller *UserController) Refresh() {
 	userId := controller.getCurUserId()
-	user := new(models.User)
+	user := new(dao.User)
 	user.Id = userId
-	user.Status = models.USER_STATUS_NORMAL
+	user.Status = dao.USER_STATUS_NORMAL
 	curUser, err := user.FindOne()
 	if err != nil {
 		controller.end(common.HandleError(err))
@@ -283,10 +284,10 @@ func (controller *UserController) FollowGet() {
 		controller.end(common.ErrorMeWithCode(err.Error(), common.ERROR_PARAM))
 		return
 	}
-	u := new(models.User)
+	u := new(dao.User)
 	id := controller.getCurUserId()
 	u.Id = id
-	var list []*models.User
+	var list []*dao.User
 	if followFlag {
 		list = u.FollowerList("name", "account")
 	} else {
@@ -307,7 +308,7 @@ func (controller *UserController) FollowPost() {
 		controller.end(common.ErrorMeWithCode(err.Error(), common.ERROR_PARAM))
 		return
 	}
-	u := new(models.User)
+	u := new(dao.User)
 	id := controller.getCurUserId()
 	u.Id = id
 	err = u.Follower(targetId)
@@ -331,7 +332,7 @@ func (controller *UserController) FollowDelete() {
 		controller.end(common.ErrorMeWithCode(err.Error(), common.ERROR_PARAM))
 		return
 	}
-	u := new(models.User)
+	u := new(dao.User)
 	id := controller.getCurUserId()
 	u.Id = id
 	err = u.UnFollower(targetId)

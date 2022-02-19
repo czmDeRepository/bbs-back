@@ -1,8 +1,9 @@
 package common
 
 import (
-	"github.com/beego/beego/v2/client/orm"
 	"time"
+
+	"github.com/beego/beego/v2/client/orm"
 )
 
 type TimeModel struct {
@@ -30,6 +31,7 @@ type Page struct {
 	PageSize int32 `json:"pageSize" form:"pageSize"`
 	Total    int64 `json:"total"`
 }
+
 func NewNotPage() *Page {
 	return &Page{PageNum: -1, PageSize: -1}
 }
@@ -59,8 +61,8 @@ func (page *Page) NeedPage() bool {
 
 // 时间范围
 type RangeTime struct {
-	StartTime time.Time		`json:"startTime,omitempty" form:"startTime"`
-	EndTime   time.Time		`json:"endTime,omitempty" form:"endTime"`
+	StartTime time.Time `json:"startTime,omitempty" form:"startTime"`
+	EndTime   time.Time `json:"endTime,omitempty" form:"endTime"`
 }
 
 func (t *RangeTime) GetStartTime() string {

@@ -8,8 +8,8 @@ import (
 )
 
 func TestDemo(t *testing.T) {
-	fmt.Println(strings.Join([]string{"1","@","2"}, ","))
-	fmt.Println(strconv.FormatInt(12,10))
+	fmt.Println(strings.Join([]string{"1", "@", "2"}, ","))
+	fmt.Println(strconv.FormatInt(12, 10))
 	fmt.Println(rune(12))
 	//new(T).Hello()
 	//new(C2).Hello()
@@ -17,6 +17,7 @@ func TestDemo(t *testing.T) {
 	//c = new(C2)
 	//c.Hello()
 }
+
 //
 //type Class interface {
 //	Hello()

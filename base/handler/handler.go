@@ -3,11 +3,12 @@ package handler
 import (
 	"bbs-back/base/common"
 	"fmt"
+	"runtime"
+	"strconv"
+
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
-	"runtime"
-	"strconv"
 )
 
 func Filter(ctx *context.Context) {

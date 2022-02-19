@@ -1,10 +1,11 @@
-package models
+package dao
 
 import (
-	"bbs-back/base/common"
-	"bbs-back/models/entity"
 	"bytes"
 	"strconv"
+
+	"bbs-back/base/common"
+	"bbs-back/models/entity"
 )
 
 type Comment struct {

@@ -1,16 +1,18 @@
 package controllers
 
 import (
-	"bbs-back/base/common"
-	"bbs-back/base/enum"
-	"bbs-back/base/storage"
 	"fmt"
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gomodule/redigo/redis"
 	"reflect"
 	"strconv"
 	"time"
+
+	"bbs-back/base/common"
+	"bbs-back/base/enum"
+	"bbs-back/base/storage"
+
+	beego "github.com/beego/beego/v2/server/web"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gomodule/redigo/redis"
 )
 
 type BaseController struct {

@@ -3,10 +3,11 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/gomodule/redigo/redis"
-	"time"
 )
 
 type RedisPool struct {

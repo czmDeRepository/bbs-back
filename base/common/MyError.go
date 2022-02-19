@@ -2,7 +2,7 @@ package common
 
 type BBSError struct {
 	ErrorCode int32
-	Message string
+	Message   string
 }
 
 func (B *BBSError) Error() string {
@@ -18,7 +18,7 @@ func NewErrorWithCode(code int32, Message string) *BBSError {
 }
 
 func HandleError(err error) Result {
-	bbsError,ok  := err.(*BBSError)
+	bbsError, ok := err.(*BBSError)
 	if ok {
 		return ErrorMeWithCode(bbsError.Error(), bbsError.ErrorCode)
 	}
