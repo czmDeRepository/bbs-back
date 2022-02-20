@@ -151,13 +151,25 @@ func (controller *PublicController) SendEmail() {
 		controller.end(common.ErrorMeWithCode("邮箱不为空", common.ERROR_PARAM))
 		return
 	}
+	// isExisted 要求该邮箱是否已注册
+	isExisted, _ := controller.GetBool("isExisted")
 	user, err := (&dao.User{Email: email}).FindOne()
-	if err != nil {
-		controller.end(common.ErrorWithMe("该邮箱还未注册"))
-		return
+	var emailKey string
+	if isExisted {
+		if err != nil {
+			controller.end(common.ErrorWithMe("该邮箱还未注册"))
+			return
+		}
+		emailKey = util.GetEmailKey(user.Account)
+	} else {
+		if err == nil {
+			controller.end(common.ErrorWithCode(common.ERROR_EMAIL_EXISTED))
+			return
+		}
+		emailKey = util.GetEmailKey(email)
 	}
 	randomString := util.GetRandomString(5)
-	err = storage.GetRedisPool().SetExp(util.GetEmailKey(user.Account), randomString, time.Minute)
+	err = storage.GetRedisPool().SetExp(emailKey, randomString, time.Minute)
 	if err != nil {
 		controller.end(common.Error(err))
 		return

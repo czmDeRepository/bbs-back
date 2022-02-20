@@ -10,6 +10,7 @@ import (
 	"bbs-back/base/util"
 	"bbs-back/models/dao"
 
+	"github.com/beego/beego/v2/client/orm"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gomodule/redigo/redis"
@@ -183,10 +184,29 @@ func init() {
 func (controller *UserController) Post() {
 	u := new(dao.User)
 	controller.ParseForm(u)
-	if u.Name == "" || u.Account == "" || u.Account == "" {
+	if u.Name == "" || u.Account == "" || u.Password == "" || u.Email == "" {
 		controller.end(common.ErrorWithMe("缺少必要参数"))
 	}
-	err := u.Insert()
+	captcha := controller.GetString("captcha")
+	content, err := storage.GetRedisPool().Get(util.GetEmailKey(u.Email))
+	if err != nil && err == redis.ErrNil || content == "" {
+		controller.end(common.ErrorWithMe("验证码已失效"))
+		return
+	}
+	if captcha != content {
+		controller.end(common.ErrorWithMe("验证码错误"))
+		return
+	}
+	_, err = (&dao.User{Email: u.Email}).FindOne()
+	if err == nil {
+		controller.end(common.ErrorWithCode(common.ERROR_EMAIL_EXISTED))
+		return
+	}
+	if err != orm.ErrNoRows {
+		controller.end(common.HandleError(err))
+		return
+	}
+	err = u.Insert()
 	if err != nil {
 		controller.end(common.HandleError(err))
 		return

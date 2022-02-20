@@ -17,6 +17,7 @@ const (
 	ERROR_TOKEN_EXPIRE  = 2003
 	ERROR_CURRENT_USER  = 2004
 	ERROR_DB_LIMIT      = 3000
+	ERROR_EMAIL_EXISTED = 3030
 	ERROR_POWER         = 5000
 )
 
@@ -29,6 +30,7 @@ var ERROR_MESSAGE = map[int32]string{
 	ERROR_TOKEN_EXPIRE:  "TOKEN已经失效",
 	ERROR_CURRENT_USER:  "非法用户操作",
 	ERROR_DB_LIMIT:      "数据操作限制",
+	ERROR_EMAIL_EXISTED: "邮箱已存在",
 	ERROR_POWER:         "权限不足",
 }
 
