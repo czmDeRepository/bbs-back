@@ -16,7 +16,7 @@ import (
 
 var driverString *captcha.DriverString
 
-func Init() {
+func InitCaptcha() {
 	// config see(https://captcha.mojotv.cn/)
 	driverString = &captcha.DriverString{
 		Height:          100,

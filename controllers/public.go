@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"time"
 
 	"bbs-back/base/baseconf"
 	"bbs-back/base/common"
@@ -16,6 +17,7 @@ import (
 	"bbs-back/base/storage"
 	"bbs-back/base/util"
 	"bbs-back/models/chat"
+	"bbs-back/models/dao"
 
 	beego "github.com/beego/beego/v2/server/web"
 )
@@ -139,4 +141,31 @@ func (controller *PublicController) PutCaptcha() {
 		"captchaKey": id,
 		"image":      image,
 	}))
+}
+
+// @Title	SendEmail
+// @router  /email [post]
+func (controller *PublicController) SendEmail() {
+	email := controller.GetString("email")
+	if email == "" {
+		controller.end(common.ErrorMeWithCode("邮箱不为空", common.ERROR_PARAM))
+		return
+	}
+	user, err := (&dao.User{Email: email}).FindOne()
+	if err != nil {
+		controller.end(common.ErrorWithMe("该邮箱还未注册"))
+		return
+	}
+	randomString := util.GetRandomString(5)
+	err = storage.GetRedisPool().SetExp(util.GetEmailKey(user.Account), randomString, time.Minute)
+	if err != nil {
+		controller.end(common.Error(err))
+		return
+	}
+	err = util.SendEmail(randomString, email)
+	if err != nil {
+		controller.end(common.Error(err))
+		return
+	}
+	controller.end(common.Success())
 }

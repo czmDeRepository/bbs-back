@@ -12,6 +12,7 @@ import (
 
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gomodule/redigo/redis"
 )
 
 // Operations about Users
@@ -203,31 +204,52 @@ func (controller *UserController) Post() {
 // @Failure 403 :id is empty
 // @router /login [get]
 func (controller *UserController) Login() {
-	account := controller.GetString("account")
-	password := controller.GetString("password")
-	if account == "" || password == "" {
-		controller.end(common.ErrorWithMe("账号密码非空"))
-		return
-	}
 	captcha := controller.GetString("captcha")
-	captchaKey := controller.GetString("captchaKey")
-	if captcha == "" || captchaKey == "" {
+	if captcha == "" {
 		controller.end(common.ErrorWithMe("验证码非空"))
 		return
 	}
-	if err := util.VerifyCaptcha(captchaKey, captcha, true); err != nil {
-		controller.end(common.Error(err))
-		return
-	}
-	param := new(dao.User)
-	param.Account = account
-	param.Password = password
-	user, err := param.FindOne()
-	if err != nil {
-		controller.end(common.ErrorWithMe("用户不存在或密码错误 "))
-		return
-	}
+	var user *dao.User
+	var err error
+	// 邮箱验证登录
+	if email := controller.GetString("email"); email != "" {
+		user, err = (&dao.User{Email: email}).FindOne()
+		if err != nil {
+			controller.end(common.Error(err))
+			return
+		}
+		content, err := storage.GetRedisPool().Get(util.GetEmailKey(user.Account))
+		if err != nil && err == redis.ErrNil || content == "" {
+			controller.end(common.ErrorWithMe("验证码已失效"))
+			return
+		}
+		if captcha != content {
+			controller.end(common.ErrorWithMe("验证码错误"))
+			return
+		}
+		storage.GetRedisPool().Del(util.GetEmailKey(user.Account))
+	} else {
+		// 账号密码登录
+		account := controller.GetString("account")
+		password := controller.GetString("password")
+		if account == "" || password == "" {
+			controller.end(common.ErrorWithMe("账号密码非空"))
+			return
+		}
 
+		if err := util.VerifyCaptcha(controller.GetString("captchaKey"), captcha, true); err != nil {
+			controller.end(common.Error(err))
+			return
+		}
+		param := new(dao.User)
+		param.Account = account
+		param.Password = password
+		user, err = param.FindOne()
+		if err != nil {
+			controller.end(common.ErrorWithMe("用户不存在或密码错误 "))
+			return
+		}
+	}
 	switch user.Status {
 	case dao.USER_STATUS_BLACKLIST:
 		controller.end(common.ErrorWithMe("您目前被限制登陆，请联系管理员解锁！！！"))

@@ -9,5 +9,6 @@ import (
 func Init() {
 	baseconf.Init()
 	storage.Init()
-	util.Init()
+	util.InitCaptcha()
+	util.InitEmail()
 }

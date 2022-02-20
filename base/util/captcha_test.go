@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateCaptcha(t *testing.T) {
-	Init()
+	InitCaptcha()
 	file, err := os.OpenFile("test.png", os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		t.Error(err)
