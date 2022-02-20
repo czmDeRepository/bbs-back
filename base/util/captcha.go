@@ -10,20 +10,22 @@ import (
 	"bbs-back/base/storage"
 
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/gomodule/redigo/redis"
 	captcha "github.com/mojocn/base64Captcha"
 )
 
 var driverString *captcha.DriverString
 
 func Init() {
+	// config see(https://captcha.mojotv.cn/)
 	driverString = &captcha.DriverString{
-		Height:          80,
+		Height:          100,
 		Width:           240,
-		NoiseCount:      20,
-		ShowLineOptions: 2,
+		NoiseCount:      0,
+		ShowLineOptions: captcha.OptionShowHollowLine,
 		Length:          5,
 		BgColor:         nil,
-		Source:          "1234567890zxcvbnmlkjhgfdsaqwertyuiopZXCVBNMLKJHGFDSAQWERTYUIOP",
+		Source:          "1234567890qwertyuiopasdfghjklzxcvbnm",
 	}
 }
 
@@ -68,14 +70,14 @@ func CreateCaptcha(w io.Writer, ids ...string) (id string, err error) {
 
 func VerifyCaptcha(id, param string, rm ...bool) error {
 	content, err := storage.GetRedisPool().Get(PreKey(id))
-	if err != nil {
+	if err != nil && err != redis.ErrNil {
 		logs.Error("captcha.verify: %v", err)
 		return err
 	}
-	if content == "" {
+	if err == redis.ErrNil || content == "" {
 		return errors.New("验证码已失效")
 	}
-	if strings.TrimSpace(param) != content {
+	if strings.ToLower(strings.TrimSpace(param)) != content {
 		return errors.New("验证码错误")
 	}
 	if len(rm) > 0 && rm[0] {
