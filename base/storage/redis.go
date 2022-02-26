@@ -114,6 +114,11 @@ func (pool *RedisPool) SetExp(key, v string, ex time.Duration) error {
 	return err
 }
 
+// GetTtl 剩余过期时间
+func (pool *RedisPool) GetTtl(key string) (int64, error) {
+	return redis.Int64(redisPool.do("TTL", key))
+}
+
 /**
 redis EXISTS
 */

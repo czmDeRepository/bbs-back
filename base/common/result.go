@@ -19,6 +19,7 @@ const (
 	ERROR_DB_LIMIT      = 3000
 	ERROR_EMAIL_EXISTED = 3030
 	ERROR_POWER         = 5000
+	ERROR_TIME_LIMIT    = 6000
 )
 
 var ERROR_MESSAGE = map[int32]string{
@@ -32,6 +33,7 @@ var ERROR_MESSAGE = map[int32]string{
 	ERROR_DB_LIMIT:      "数据操作限制",
 	ERROR_EMAIL_EXISTED: "邮箱已存在",
 	ERROR_POWER:         "权限不足",
+	ERROR_TIME_LIMIT:    "操作太频繁",
 }
 
 func SuccessWithData(data interface{}) (res Result) {

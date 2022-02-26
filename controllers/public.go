@@ -162,11 +162,21 @@ func (controller *PublicController) SendEmail() {
 		}
 		emailKey = util.GetEmailKey(user.Account)
 	} else {
+		// 要求邮箱没被注册，在注册时邮箱使用，err == nil 说明邮箱已被注册
 		if err == nil {
 			controller.end(common.ErrorWithCode(common.ERROR_EMAIL_EXISTED))
 			return
 		}
 		emailKey = util.GetEmailKey(email)
+	}
+	ttl, err := storage.GetRedisPool().GetTtl(emailKey)
+	if err != nil {
+		controller.end(common.Error(err))
+		return
+	}
+	if ttl > 0 {
+		controller.end(common.ErrorMeWithCode(fmt.Sprintf("操作太频繁，请于%d秒后重试", ttl), common.ERROR_TIME_LIMIT))
+		return
 	}
 	randomString := util.GetRandomString(5)
 	err = storage.GetRedisPool().SetExp(emailKey, randomString, time.Minute)
