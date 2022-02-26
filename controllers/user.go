@@ -107,7 +107,6 @@ func (controller *UserController) GetAll() {
 // @Success 200 {object} dto.Result
 // @router	/ [put]
 func (controller *UserController) Put() {
-
 	param := new(dao.User)
 	controller.ParseForm(param)
 	if param.Id == 0 {
@@ -121,6 +120,29 @@ func (controller *UserController) Put() {
 		if curUserId != param.Id {
 			controller.end(common.ErrorDetail(common.ERROR_CURRENT_USER, "不可修改其他用户信息！！！"))
 			return
+		}
+	}
+
+	// 修改密码
+	if param.Password != "" {
+		captcha := controller.GetString("captcha")
+		if captcha == "" {
+			controller.end(common.ErrorWithMe("验证码非空"))
+			return
+		}
+		content, err := storage.GetRedisPool().Get(util.GetEmailKey(param.Account))
+		if err != nil && err == redis.ErrNil || content == "" {
+			controller.end(common.ErrorWithMe("验证码已失效"))
+			return
+		}
+		if captcha != content {
+			controller.end(common.ErrorWithMe("验证码错误"))
+			return
+		}
+		storage.GetRedisPool().Del(util.GetEmailKey(param.Account))
+		param = &dao.User{
+			Id:       param.Id,
+			Password: param.Password,
 		}
 	}
 	err := param.Update()
