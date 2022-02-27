@@ -20,3 +20,5 @@ go.sum
 *.tmp
 *.zip
 /resources/*
+/routers/commentsRouter_.go
+/routers/commentsRouter_controllers.go
