@@ -115,16 +115,30 @@ func (controller *UserController) Put() {
 	}
 	role := controller.getCurUserRole()
 
-	if role != dao.USER_ROLE_ADMIN && role != dao.USER_ROLE_SUPER_ADMIN {
-		curUserId := controller.getCurUserId()
-		if curUserId != param.Id {
+	curUserId := controller.getCurUserId()
+	if curUserId != param.Id {
+		if role == dao.USER_ROLE_ADMIN || role == dao.USER_ROLE_SUPER_ADMIN {
+			// 普通管理员之间无法互相修改
+			if role == dao.USER_ROLE_ADMIN {
+				target, err := (&dao.User{Id: param.Id}).Read()
+				if err != nil {
+					controller.end(common.HandleError(err))
+					return
+				}
+				if target.Role == dao.USER_ROLE_ADMIN {
+					controller.end(common.ErrorDetail(common.ERROR_CURRENT_USER, "不可修改其他管理员用户信息！！！"))
+					return
+				}
+			}
+			// 普通用户无权修改其他用户信息
+		} else {
 			controller.end(common.ErrorDetail(common.ERROR_CURRENT_USER, "不可修改其他用户信息！！！"))
 			return
 		}
 	}
 
-	// 修改密码
-	if param.Password != "" {
+	// 修改密码 curUserId != param.Id 为管理员重置密码，不需要验证码
+	if param.Password != "" && curUserId == param.Id {
 		captcha := controller.GetString("captcha")
 		if captcha == "" {
 			controller.end(common.ErrorWithMe("验证码非空"))
