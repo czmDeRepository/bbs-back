@@ -1,21 +1,22 @@
 package test
 
 import (
-	"bbs-back/base"
-	"bbs-back/models"
-	_ "bbs-back/routers"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"runtime"
 	"testing"
 
+	"bbs-back/base"
+	"bbs-back/models"
+	_ "bbs-back/routers"
+
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func init() {
+func Init() {
 	base.Init()
 	models.Init()
 	_, file, _, _ := runtime.Caller(0)
@@ -25,6 +26,7 @@ func init() {
 
 // TestGet is a sample to run an endpoint test
 func TestGet(t *testing.T) {
+	Init()
 	r, _ := http.NewRequest("GET", "/v1/article", nil)
 	w := httptest.NewRecorder()
 	beego.BeeApp.Handlers.ServeHTTP(w, r)

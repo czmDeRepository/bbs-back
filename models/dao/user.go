@@ -6,6 +6,7 @@ import (
 	"bbs-back/base/common"
 	"bbs-back/base/dto/information"
 	"bbs-back/base/storage"
+	"bbs-back/base/util"
 	"bbs-back/models/entity"
 
 	"github.com/beego/beego/v2/client/orm"
@@ -33,7 +34,17 @@ func (u *User) Read() (*User, error) {
 
 func (u *User) FindOne() (*User, error) {
 	res := new(User)
-	err := u.createQsByParam().One(res)
+	qs := u.createQsByParam()
+	if u.Password != "" {
+		// 密码加密
+		password, err := util.DecryptPassword(u.Password)
+		if err != nil {
+			return nil, err
+		}
+		u.Password = password
+		qs = qs.Filter("password", u.Password)
+	}
+	err := qs.One(res)
 	return res, err
 }
 
@@ -81,9 +92,6 @@ func (u *User) createQsByParam() orm.QuerySeter {
 	if u.Name != "" {
 		qs = qs.Filter("name__icontains", u.Name)
 	}
-	if u.Password != "" {
-		qs = qs.Filter("password", u.Password)
-	}
 	if u.Account != "" {
 		qs = qs.Filter("account", u.Account)
 	}
@@ -117,6 +125,12 @@ func (u *User) Insert() error {
 	if u.Status == 0 {
 		u.Status = 1
 	}
+	// 密码加密
+	password, err := util.DecryptPassword(u.Password)
+	if err != nil {
+		return err
+	}
+	u.Password = password
 	id, err := ORM.Insert(u)
 	if err != nil {
 		return common.NewErrorWithCode(common.ERROR_DB_LIMIT, err.Error())
@@ -143,6 +157,12 @@ func (u *User) Update() error {
 	}
 	if u.Password != "" {
 		cols = append(cols, "password")
+		// 密码加密
+		password, err := util.DecryptPassword(u.Password)
+		if err != nil {
+			return err
+		}
+		u.Password = password
 	}
 	if u.Email != "" {
 		cols = append(cols, "email")
