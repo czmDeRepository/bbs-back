@@ -176,9 +176,8 @@ func (u *User) Update() error {
 	if u.Gender != "" {
 		cols = append(cols, "gender")
 	}
-	if u.TelephoneNumber > 0 {
-		cols = append(cols, "telephone_number")
-	}
+	// 电话允许置空
+	cols = append(cols, "telephone_number")
 	if u.ImageUrl != "" {
 		cols = append(cols, "image_url")
 	}

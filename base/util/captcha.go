@@ -68,8 +68,8 @@ func CreateCaptcha(w io.Writer, ids ...string) (id string, err error) {
 	return id, err
 }
 
-func VerifyCaptcha(id, param string, rm ...bool) error {
-	content, err := storage.GetRedisPool().Get(PreKey(id))
+func VerifyCaptcha(key, param string, rm ...bool) error {
+	content, err := storage.GetRedisPool().Get(key)
 	if err != nil && err != redis.ErrNil {
 		logs.Error("captcha.verify: %v", err)
 		return err
@@ -81,7 +81,7 @@ func VerifyCaptcha(id, param string, rm ...bool) error {
 		return errors.New("验证码错误")
 	}
 	if len(rm) > 0 && rm[0] {
-		storage.GetRedisPool().Del(PreKey(id))
+		storage.GetRedisPool().Del(key)
 	}
 	return nil
 }

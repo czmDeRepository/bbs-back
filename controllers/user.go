@@ -13,7 +13,6 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gomodule/redigo/redis"
 )
 
 // Operations about Users
@@ -137,26 +136,44 @@ func (controller *UserController) Put() {
 		}
 	}
 
-	// 修改密码 curUserId != param.Id 为管理员重置密码，不需要验证码
-	if param.Password != "" && curUserId == param.Id {
+	// 修改邮箱密码验证， curUserId != param.Id 为管理员重置密码，不需要验证码
+	if (param.Password != "" || param.Email != "") && curUserId == param.Id {
 		captcha := controller.GetString("captcha")
 		if captcha == "" {
 			controller.end(common.ErrorWithMe("验证码非空"))
 			return
 		}
-		content, err := storage.GetRedisPool().Get(util.GetEmailKey(param.Account))
-		if err != nil && err == redis.ErrNil || content == "" {
-			controller.end(common.ErrorWithMe("验证码已失效"))
-			return
-		}
-		if captcha != content {
-			controller.end(common.ErrorWithMe("验证码错误"))
-			return
-		}
-		storage.GetRedisPool().Del(util.GetEmailKey(param.Account))
-		param = &dao.User{
-			Id:       param.Id,
-			Password: param.Password,
+		if param.Email != "" { // 修改邮箱
+			//	验证密码
+			user := new(dao.User)
+			user.Password = param.Password
+			user.Id = param.Id
+			_, err := user.FindOne()
+			if err != nil {
+				if err == orm.ErrNoRows {
+					controller.end(common.ErrorWithMe("密码错误"))
+					return
+				}
+				controller.end(common.Error(err))
+				return
+			}
+			if err := util.VerifyCaptcha(util.GetEmailKey(param.Email), captcha, true); err != nil {
+				controller.end(common.Error(err))
+				return
+			}
+			param = &dao.User{
+				Id:    param.Id,
+				Email: param.Email,
+			}
+		} else { // 修改密码
+			if err := util.VerifyCaptcha(util.GetEmailKey(param.Account), captcha, true); err != nil {
+				controller.end(common.Error(err))
+				return
+			}
+			param = &dao.User{
+				Id:       param.Id,
+				Password: param.Password,
+			}
 		}
 	}
 	err := param.Update()
@@ -224,16 +241,11 @@ func (controller *UserController) Post() {
 		controller.end(common.ErrorWithMe("缺少必要参数"))
 	}
 	captcha := controller.GetString("captcha")
-	content, err := storage.GetRedisPool().Get(util.GetEmailKey(u.Email))
-	if err != nil && err == redis.ErrNil || content == "" {
-		controller.end(common.ErrorWithMe("验证码已失效"))
+	if err := util.VerifyCaptcha(util.GetEmailKey(u.Email), captcha, true); err != nil {
+		controller.end(common.Error(err))
 		return
 	}
-	if captcha != content {
-		controller.end(common.ErrorWithMe("验证码错误"))
-		return
-	}
-	_, err = (&dao.User{Email: u.Email}).FindOne()
+	_, err := (&dao.User{Email: u.Email}).FindOne()
 	if err == nil {
 		controller.end(common.ErrorWithCode(common.ERROR_EMAIL_EXISTED))
 		return
@@ -274,16 +286,10 @@ func (controller *UserController) Login() {
 			controller.end(common.Error(err))
 			return
 		}
-		content, err := storage.GetRedisPool().Get(util.GetEmailKey(user.Account))
-		if err != nil && err == redis.ErrNil || content == "" {
-			controller.end(common.ErrorWithMe("验证码已失效"))
+		if err := util.VerifyCaptcha(util.GetEmailKey(user.Account), captcha, true); err != nil {
+			controller.end(common.Error(err))
 			return
 		}
-		if captcha != content {
-			controller.end(common.ErrorWithMe("验证码错误"))
-			return
-		}
-		storage.GetRedisPool().Del(util.GetEmailKey(user.Account))
 	} else {
 		// 账号密码登录
 		account := controller.GetString("account")
@@ -293,7 +299,7 @@ func (controller *UserController) Login() {
 			return
 		}
 
-		if err := util.VerifyCaptcha(controller.GetString("captchaKey"), captcha, true); err != nil {
+		if err := util.VerifyCaptcha(util.PreKey(controller.GetString("captchaKey")), captcha, true); err != nil {
 			controller.end(common.Error(err))
 			return
 		}

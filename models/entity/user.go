@@ -8,7 +8,7 @@ type User struct {
 	Password        string `json:"password" form:"password"`
 	Account         string `json:"account" form:"account"`
 	Email           string `json:"email" form:"email"`
-	TelephoneNumber int64  `json:"telephoneNumber" form:"telephoneNumber"`
+	TelephoneNumber string `json:"telephoneNumber" form:"telephoneNumber"`
 	Age             int32  `json:"age" form:"age"`
 	Status          int32  `json:"status" form:"status"`
 	common.TimeModel
