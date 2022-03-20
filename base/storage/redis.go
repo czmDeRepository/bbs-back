@@ -146,15 +146,33 @@ func (pool *RedisPool) SetNX(key string, value interface{}) error {
 redis GET
 return map
 */
-func (pool *RedisPool) GetJson(key string) (map[string]string, error) {
-	var jsonData map[string]string
+func (pool *RedisPool) SetJson(key string, value interface{}, ex ...time.Duration) error {
+	valueStr, errJson := json.Marshal(value)
+	if errJson != nil {
+		logs.Error("json nil", errJson.Error())
+		return errJson
+	}
+	if len(ex) > 0 {
+		_, err := redisPool.do("SET", key, valueStr, "EX", ex[0].Seconds())
+		return err
+	}
+	_, err := redisPool.do("SET", key, valueStr)
+	return err
+}
+
+/**
+redis GET
+return map
+*/
+func (pool *RedisPool) GetJson(key string) (map[string]interface{}, error) {
+	var jsonData map[string]interface{}
 	bv, err := redis.Bytes(redisPool.do("GET", key))
 	if err != nil {
 		return nil, err
 	}
 	errJson := json.Unmarshal(bv, &jsonData)
 	if errJson != nil {
-		logs.Error("json nil", err.Error())
+		logs.Error("json nil", errJson.Error())
 		return nil, err
 	}
 	return jsonData, nil
