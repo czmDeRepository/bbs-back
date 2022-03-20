@@ -42,7 +42,7 @@ func init() {
 // @Param	image	File	true	"上传文件"
 // @router /upload [post]
 func (controller *PublicController) Upload() {
-	controller.getCurUserId()
+	controller.mustLogin()
 	// key is the file name
 	file, fileHeader, err := controller.GetFile("image")
 	if err != nil {

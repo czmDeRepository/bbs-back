@@ -4,7 +4,7 @@ import (
 	"bbs-back/base"
 	"bbs-back/base/handler"
 	"bbs-back/models"
-	_ "bbs-back/routers"
+	"bbs-back/routers"
 
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/filter/cors"
@@ -38,4 +38,5 @@ func main() {
 func Init() {
 	base.Init()
 	models.Init()
+	routers.Init()
 }

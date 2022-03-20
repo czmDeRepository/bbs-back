@@ -25,7 +25,7 @@ type Comment struct {
 	ChildrenList []*Comment `json:"childrenList" orm:"-"`
 }
 
-func (c *Comment) Insert() error {
+func (c *Comment) Insert() (int64, error) {
 	if c.Status == 0 {
 		c.Status = 1
 	}
@@ -33,10 +33,13 @@ func (c *Comment) Insert() error {
 		c.RepliedUserId = -1
 	}
 	c.CreateTime = *common.Now()
-	_, err := ORM.Raw("insert into comment (article_id, user_id, replied_user_id, create_time, update_time, content, status, comment_id) values (?, ?, ?, ?, ?, ?, ?, ?)",
+	res, err := ORM.Raw("insert into comment (article_id, user_id, replied_user_id, create_time, update_time, content, status, comment_id) values (?, ?, ?, ?, ?, ?, ?, ?)",
 		c.ArticleId, c.UserId, c.RepliedUserId, c.CreateTime.Time, c.CreateTime.Time, c.Content, c.Status, c.CommentId,
 	).Exec()
-	return err
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
 }
 
 func (c *Comment) Read() (*Comment, error) {

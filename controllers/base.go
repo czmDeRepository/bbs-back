@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -123,4 +124,12 @@ func (controller *BaseController) getCurUserRole() int64 {
 
 func (controller *BaseController) paramError(err error) {
 	controller.end(common.ErrorMeWithCode(err.Error(), common.ERROR_PARAM))
+}
+
+func (controller *BaseController) context() context.Context {
+	return controller.Ctx.Request.Context()
+}
+
+func (controller *BaseController) mustLogin() {
+	controller.getCurUserId()
 }

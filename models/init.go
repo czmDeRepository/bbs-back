@@ -13,7 +13,7 @@ func Init() {
 	if beego.BConfig.RunMode == "dev" {
 		orm.Debug = true
 	}
-	orm.RegisterModel(new(dao.Article), new(dao.Category), new(dao.Comment), new(dao.Label), new(dao.User))
+	orm.RegisterModel(new(dao.Article), new(dao.Category), new(dao.Comment), new(dao.Label), new(dao.User), new(dao.Message))
 	dao.ORM = orm.NewOrm()
 	totalUserNum, _ := new(dao.User).Count()
 	storage.GetRedisPool().Set(information.TOTAL_USER_NUM, totalUserNum)

@@ -13,7 +13,7 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 )
 
-func init() {
+func Init() {
 
 	ns := beego.NewNamespace("/v1",
 		beego.NSInclude(
@@ -47,6 +47,11 @@ func init() {
 		beego.NSNamespace("/ws",
 			beego.NSInclude(
 				&controllers.WebSocketController{},
+			),
+		),
+		beego.NSNamespace("/message",
+			beego.NSInclude(
+				&controllers.MessageController{},
 			),
 		),
 	)

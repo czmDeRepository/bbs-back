@@ -32,3 +32,8 @@ type CommentDto struct {
 	dao.Comment
 	common.PageDto
 }
+
+type MessageDto struct {
+	dao.Message
+	common.PageDto
+}

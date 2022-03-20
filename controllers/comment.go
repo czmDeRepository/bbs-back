@@ -140,7 +140,42 @@ func (controller *CommentController) Post() {
 		return
 	}
 	comment.UserId = curUserId
-	err = comment.Insert()
+	id, err := comment.Insert()
+	if err != nil {
+		controller.end(common.HandleError(err))
+		return
+	}
+	// 自己回复自己，不触发消息
+	if curUserId == comment.RepliedUserId {
+		controller.end(common.Success())
+		return
+	}
+	// 保持消息
+	article := new(dao.Article)
+	article.Id = comment.ArticleId
+	article, err = article.Read()
+
+	message := &dao.Message{}
+	message.CommentId = id
+	message.CreatorId = curUserId
+	if comment.RepliedUserId != -1 {
+		// 自己回复自己，不触发消息
+		if comment.RepliedUserId == curUserId {
+			controller.end(common.Success())
+			return
+		}
+		message.TargetId = comment.RepliedUserId
+		message.Kind = 2
+	} else {
+		// 自己评论自己论坛，不触发消息
+		if article.UserId == curUserId {
+			controller.end(common.Success())
+			return
+		}
+		message.TargetId = article.UserId
+		message.Kind = 1
+	}
+	err = message.Insert(controller.context())
 	if err != nil {
 		controller.end(common.HandleError(err))
 		return
