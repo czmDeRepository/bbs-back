@@ -79,7 +79,8 @@ func (c *Comment) Find(page *common.Page, desc bool) ([]*Comment, error) {
 		sql.WriteString(" and c.replied_user_id = ")
 		sql.WriteString(strconv.FormatInt(c.RepliedUserId, 10))
 	}
-	if c.CommentId != 0 {
+	// -1：查询所有，0：查询评论，>0: 回复评论
+	if c.CommentId > -1 {
 		sql.WriteString(" and c.comment_id = ")
 		sql.WriteString(strconv.FormatInt(c.CommentId, 10))
 	}

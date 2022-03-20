@@ -39,6 +39,7 @@ func (controller *CommentController) Get() {
 // @Param	pageNum			query	int32		false
 // @Param	pageSize		query	int32		false
 // @Param	isDetail		query	bool		false	"是否包含子回复"
+// @Param   commentId		query	int32		false   "-1：查询所有，0：查询评论，>0: 回复评论"
 // @Success 0 {object} dto.Result
 // @Failure 1000 :参数错误
 // @router	/ [get]
