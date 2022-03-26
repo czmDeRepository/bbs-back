@@ -117,7 +117,7 @@ func (c *Comment) Count() (int64, error) {
 	if c.RepliedUserId != 0 {
 		qs = qs.Filter("replied_user_id", c.RepliedUserId)
 	}
-	if c.CommentId != 0 {
+	if c.CommentId > -1 {
 		qs = qs.Filter("comment_id", c.CommentId)
 	}
 	return qs.Count()
