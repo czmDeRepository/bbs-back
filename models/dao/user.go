@@ -98,8 +98,8 @@ func (u *User) createQsByParam() orm.QuerySeter {
 	if u.Email != "" {
 		qs = qs.Filter("email", u.Email)
 	}
-	if u.Age != 0 {
-		qs = qs.Filter("age", u.Age)
+	if !u.Birthday.IsZero() {
+		qs = qs.Filter("birthday", u.Birthday.Time)
 	}
 	if u.Status != 0 {
 		qs = qs.Filter("status", u.Status)
@@ -167,8 +167,8 @@ func (u *User) Update() error {
 	if u.Email != "" {
 		cols = append(cols, "email")
 	}
-	if u.Age != 0 {
-		cols = append(cols, "age")
+	if !u.Birthday.IsZero() {
+		cols = append(cols, "birthday")
 	}
 	if u.Role != 0 {
 		cols = append(cols, "role")

@@ -112,6 +112,7 @@ func (controller *UserController) Put() {
 		controller.end(common.ErrorDetail(common.ERROR_PARAM, "用户id为空"))
 		return
 	}
+	setDateTime(controller.GetString("birthday"), param, "Birthday")
 	role := controller.getCurUserRole()
 
 	curUserId := controller.getCurUserId()
