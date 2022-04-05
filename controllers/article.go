@@ -95,6 +95,23 @@ func (controller *ArticleController) Put() {
 		controller.paramError(common.NewError("id不为空"))
 		return
 	}
+	role := controller.getCurUserRole()
+	// 非管理员只能操作自己的论贴
+	if role != dao.USER_ROLE_SUPER_ADMIN && role != dao.USER_ROLE_ADMIN {
+		curUserId := controller.getCurUserId()
+		param := new(dao.Article)
+		param.UserId = curUserId
+		param.Id = article.Id
+		count, err := param.Count(nil)
+		if err != nil {
+			controller.end(common.HandleError(err))
+			return
+		}
+		if count == 0 {
+			controller.end(common.ErrorWithCode(common.ERROR_POWER))
+			return
+		}
+	}
 	labelStrings := controller.GetString("labelList")
 	var labelList []string
 	if labelStrings != "" {
@@ -147,7 +164,7 @@ func (controller *ArticleController) Delete() {
 	role := controller.getCurUserRole()
 	article := new(dao.Article)
 	article.Id = id
-	if role == dao.USER_ROLE_USER {
+	if role != dao.USER_ROLE_SUPER_ADMIN && role != dao.USER_ROLE_ADMIN {
 		article.UserId = userId
 		count, _ := article.Count(nil)
 		if count == 0 {

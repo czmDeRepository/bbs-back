@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"time"
+
 	"bbs-back/base/common"
+	"bbs-back/base/dto/information"
+	"bbs-back/base/storage"
+
 	"fmt"
 	"runtime"
 	"strconv"
@@ -12,7 +17,8 @@ import (
 )
 
 func Filter(ctx *context.Context) {
-
+	// 活跃统计
+	storage.GetRedisPool().PFADD(information.GetActiveVisitorKey(time.Now()), ctx.Input.IP())
 	//request := ctx.Request
 	//uri := request.RequestURI
 	//if strings.HasPrefix(uri, "/v1/user") {

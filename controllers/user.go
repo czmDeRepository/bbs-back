@@ -369,6 +369,7 @@ func (controller *UserController) Refresh() {
 	controller.end(common.SuccessWithData(token))
 }
 
+/**
 // @Title Follow
 // @Description 获取关注列表
 // @Param	id		Query 	int64	true "The key for staticblock"
@@ -440,3 +441,4 @@ func (controller *UserController) FollowDelete() {
 	}
 	controller.end(common.Success())
 }
+*/

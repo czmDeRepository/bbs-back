@@ -95,14 +95,13 @@ func (controller *PublicController) Upload() {
 func (controller *PublicController) Information() {
 	totalReadNumStr, _ := storage.GetRedisPool().Get(information.TOTAL_READ_NUM)
 	totalReadNum, _ := strconv.ParseInt(totalReadNumStr, 10, 64)
-	totalUserNumStr, _ := storage.GetRedisPool().Get(information.TOTAL_USER_NUM)
-	totalUserNum, _ := strconv.ParseInt(totalUserNumStr, 10, 64)
+	activeVisitorNum, _ := storage.GetRedisPool().PFCOUNT(information.GetActiveVisitorKey())
 	totalArticleNumStr, _ := storage.GetRedisPool().Get(information.TOTAL_ARTICLE_NUM)
 	totalArticleNum, _ := strconv.ParseInt(totalArticleNumStr, 10, 64)
 	totalChatNum := chat.OnLineNum()
 	res := new(information.Information)
 	res.TotalReadNum = totalReadNum
-	res.TotalUserNum = totalUserNum
+	res.ActiveVisitorNum = activeVisitorNum
 	res.TotalArticleNum = totalArticleNum
 	res.TotalChatPersonNum = totalChatNum
 	controller.end(common.SuccessWithData(res))

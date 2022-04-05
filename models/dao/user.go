@@ -1,11 +1,9 @@
 package dao
 
 import (
-	"strings"
+	"context"
 
 	"bbs-back/base/common"
-	"bbs-back/base/dto/information"
-	"bbs-back/base/storage"
 	"bbs-back/base/util"
 	"bbs-back/models/entity"
 
@@ -135,7 +133,6 @@ func (u *User) Insert() error {
 	if err != nil {
 		return common.NewErrorWithCode(common.ERROR_DB_LIMIT, err.Error())
 	}
-	storage.GetRedisPool().Incr(information.TOTAL_USER_NUM)
 	u.Id = id
 	return err
 }
@@ -191,50 +188,55 @@ func (u *User) Update() error {
 	return err
 }
 
-// 获取我关注者的列表
-func (u *User) FollowerList(cols ...string) []*User {
-	var colsStr string
-	if len(cols) > 0 {
-		colsStr = "," + strings.Join(cols, ",")
-	}
-	sql := "select user.id" + colsStr +
-		" from user inner join" +
-		" (select followed_id as id from user inner join follower on user.id = follower.follower_id where user.status > 0 and user.id = ?)" +
-		" as temp on user.id = temp.id"
-	raw := ORM.Raw(sql, u.Id)
-	var res []*User
-	raw.QueryRows(&res)
-	return res
+// 自由查询
+func (u *User) GetQS(ctx context.Context) orm.QuerySeter {
+	return ORM.QueryTableWithCtx(ctx, tableName)
 }
 
-// 关注我的列表
-func (u *User) FolloweredList(cols ...string) []*User {
-	var colsStr string
-	if len(cols) > 0 {
-		colsStr = "," + strings.Join(cols, ",")
-	}
-	sql := "select user.id " + colsStr +
-		" from user inner join" +
-		" (select follower_id as id from user inner join follower on user.id = follower.followed_id where user.status > 0 and user.id = ?)" +
-		" as temp on user.id = temp.id"
+//// 获取我关注者的列表
+//func (u *User) FollowerList(cols ...string) []*User {
+//	var colsStr string
+//	if len(cols) > 0 {
+//		colsStr = "," + strings.Join(cols, ",")
+//	}
+//	sql := "select user.id" + colsStr +
+//		" from user inner join" +
+//		" (select followed_id as id from user inner join follower on user.id = follower.follower_id where user.status > 0 and user.id = ?)" +
+//		" as temp on user.id = temp.id"
+//	raw := ORM.Raw(sql, u.Id)
+//	var res []*User
+//	raw.QueryRows(&res)
+//	return res
+//}
 
-	raw := ORM.Raw(sql, u.Id)
-	var res []*User
-	raw.QueryRows(&res)
-	return res
-}
-
-func (u *User) Follower(id int64) error {
-	var num int32
-	ORM.Raw("select count(*) from follower where followed_id = ? and follower_id = ?", id, u.Id).QueryRow(&num)
-	if num > 0 {
-		return common.NewErrorWithCode(common.ERROR_DB_LIMIT, "重复关注！！！")
-	}
-	_, err := ORM.Raw("insert into follower (followed_id, follower_id) values(?,?)", id, u.Id).Exec()
-	return err
-}
-
-func (u *User) UnFollower(id int64) error {
-	_, err := ORM.Raw("delete from follower where followed_id = ? and follower_id = ?", id, u.Id).Exec()
-	return err
-}
+//// 关注我的列表
+//func (u *User) FolloweredList(cols ...string) []*User {
+//	var colsStr string
+//	if len(cols) > 0 {
+//		colsStr = "," + strings.Join(cols, ",")
+//	}
+//	sql := "select user.id " + colsStr +
+//		" from user inner join" +
+//		" (select follower_id as id from user inner join follower on user.id = follower.followed_id where user.status > 0 and user.id = ?)" +
+//		" as temp on user.id = temp.id"
+//
+//	raw := ORM.Raw(sql, u.Id)
+//	var res []*User
+//	raw.QueryRows(&res)
+//	return res
+//}
+//
+//func (u *User) Follower(id int64) error {
+//	var num int32
+//	ORM.Raw("select count(*) from follower where followed_id = ? and follower_id = ?", id, u.Id).QueryRow(&num)
+//	if num > 0 {
+//		return common.NewErrorWithCode(common.ERROR_DB_LIMIT, "重复关注！！！")
+//	}
+//	_, err := ORM.Raw("insert into follower (followed_id, follower_id) values(?,?)", id, u.Id).Exec()
+//	return err
+//}
+//
+//func (u *User) UnFollower(id int64) error {
+//	_, err := ORM.Raw("delete from follower where followed_id = ? and follower_id = ?", id, u.Id).Exec()
+//	return err
+//}

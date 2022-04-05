@@ -82,7 +82,7 @@ func logCommand(con redis.Conn, commandName string, args ...interface{}) (reply 
 	if err != nil {
 		logs.Error("redis command ==>", commandName, args, "result:", res, "error:", err)
 	} else if beego.BConfig.RunMode != beego.PROD {
-		logs.Critical("redis command ==>", commandName, args, "result:", res, "error:", err)
+		logs.Info("redis command ==>", commandName, args, "result:", res, "error:", err)
 	}
 	return res, err
 }
@@ -90,47 +90,59 @@ func logCommand(con redis.Conn, commandName string, args ...interface{}) (reply 
 /**
 redis  SET
 */
-func (pool *RedisPool) Set(key, v interface{}) (bool, error) {
-	return redis.Bool(redisPool.do("SET", key, v))
+func (pool *RedisPool) Set(key, v interface{}, ex ...time.Duration) (err error) {
+	if len(ex) > 0 {
+		_, err := pool.do("SET", key, v, "EX", ex[0].Seconds())
+		return err
+	}
+	_, err = pool.do("SET", key, v)
+	return
 }
 
 /**
 redis  GET
 */
 func (pool *RedisPool) Get(key string) (string, error) {
-	return redis.String(redisPool.do("GET", key))
+	return redis.String(pool.do("GET", key))
+}
+
+/**
+redis  GET
+*/
+func (pool *RedisPool) GetInt64(key string) (int64, error) {
+	return redis.Int64(pool.do("GET", key))
 }
 
 /**
 redis EXPIRE
 */
 func (pool *RedisPool) Expire(key string, ex time.Duration) error {
-	_, err := redisPool.do("EXPIRE", key, ex.Seconds())
+	_, err := pool.do("EXPIRE", key, ex.Seconds())
 	return err
 }
 
 func (pool *RedisPool) SetExp(key, v string, ex time.Duration) error {
-	_, err := redisPool.do("SET", key, v, "EX", ex.Seconds())
+	_, err := pool.do("SET", key, v, "EX", ex.Seconds())
 	return err
 }
 
 // GetTtl 剩余过期时间
 func (pool *RedisPool) GetTtl(key string) (int64, error) {
-	return redis.Int64(redisPool.do("TTL", key))
+	return redis.Int64(pool.do("TTL", key))
 }
 
 /**
 redis EXISTS
 */
 func (pool *RedisPool) Exist(key string) (bool, error) {
-	return redis.Bool(redisPool.do("EXISTS", key))
+	return redis.Bool(pool.do("EXISTS", key))
 }
 
 /**
 redis DEL
 */
 func (pool *RedisPool) Del(key string) error {
-	_, err := redisPool.do("DEL", key)
+	_, err := pool.do("DEL", key)
 	return err
 }
 
@@ -138,7 +150,7 @@ func (pool *RedisPool) Del(key string) error {
 redis SETNX
 */
 func (pool *RedisPool) SetNX(key string, value interface{}) error {
-	_, err := redisPool.do("SETNX", key, value)
+	_, err := pool.do("SETNX", key, value)
 	return err
 }
 
@@ -152,37 +164,30 @@ func (pool *RedisPool) SetJson(key string, value interface{}, ex ...time.Duratio
 		logs.Error("json nil", errJson.Error())
 		return errJson
 	}
-	if len(ex) > 0 {
-		_, err := redisPool.do("SET", key, valueStr, "EX", ex[0].Seconds())
-		return err
-	}
-	_, err := redisPool.do("SET", key, valueStr)
-	return err
+	return pool.Set(key, valueStr, ex...)
 }
 
 /**
 redis GET
-return map
 */
-func (pool *RedisPool) GetJson(key string) (map[string]interface{}, error) {
-	var jsonData map[string]interface{}
-	bv, err := redis.Bytes(redisPool.do("GET", key))
+func (pool *RedisPool) GetJson(key string, res interface{}) error {
+	bv, err := redis.Bytes(pool.do("GET", key))
 	if err != nil {
-		return nil, err
+		return err
 	}
-	errJson := json.Unmarshal(bv, &jsonData)
+	errJson := json.Unmarshal(bv, res)
 	if errJson != nil {
 		logs.Error("json nil", errJson.Error())
-		return nil, err
+		return err
 	}
-	return jsonData, nil
+	return nil
 }
 
 /**
 redis hSet 注意 设置什么类型 取的时候需要获取对应类型
 */
 func (pool *RedisPool) HSet(key string, field string, data interface{}) error {
-	_, err := redisPool.do("HSET", key, field, data)
+	_, err := pool.do("HSET", key, field, data)
 	return err
 }
 
@@ -190,7 +195,7 @@ func (pool *RedisPool) HSet(key string, field string, data interface{}) error {
 redis hGet  设置什么类型 取的时候需要获取对应类型
 */
 func (pool *RedisPool) HGet(key, field string) (interface{}, error) {
-	return redisPool.do("HGET", key, field)
+	return pool.do("HGET", key, field)
 }
 
 /**
@@ -198,14 +203,14 @@ redis hGetAll
 return map
 */
 func (pool *RedisPool) HGetAll(key string) (map[string]string, error) {
-	return redis.StringMap(redisPool.do("HGETALL", key))
+	return redis.StringMap(pool.do("HGETALL", key))
 }
 
 /**
 redis INCR 将 key 中储存的数字值增一
 */
 func (pool *RedisPool) Incr(key string) error {
-	_, err := redisPool.do("INCR", key)
+	_, err := pool.do("INCR", key)
 	return err
 }
 
@@ -213,7 +218,7 @@ func (pool *RedisPool) Incr(key string) error {
 redis INCRBY 将 key 所储存的值加上增量 n
 */
 func (pool *RedisPool) IncrBy(key string, n int) error {
-	_, err := redisPool.do("INCRBY", key, n)
+	_, err := pool.do("INCRBY", key, n)
 	return err
 }
 
@@ -221,7 +226,7 @@ func (pool *RedisPool) IncrBy(key string, n int) error {
 redis DECR 将 key 中储存的数字值减一。
 */
 func (pool *RedisPool) Decr(key string) error {
-	_, err := redisPool.do("DECR", key)
+	_, err := pool.do("DECR", key)
 	return err
 }
 
@@ -229,6 +234,21 @@ func (pool *RedisPool) Decr(key string) error {
 redis DECRBY 将 key 所储存的值减去减量 n
 */
 func (pool *RedisPool) DecrBy(key string, n int) error {
-	_, err := redisPool.do("DECRBY", key, n)
+	_, err := pool.do("DECRBY", key, n)
 	return err
+}
+
+/**
+Hyperloglog 基数统计
+*/
+func (pool *RedisPool) PFADD(key string, value interface{}) (err error) {
+	_, err = pool.do("PFADD", key, value)
+	return
+}
+
+/**
+Hyperloglog 基数统计
+*/
+func (pool *RedisPool) PFCOUNT(key string) (int64, error) {
+	return redis.Int64(pool.do("PFCOUNT", key))
 }

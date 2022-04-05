@@ -2,6 +2,7 @@ package dao
 
 import (
 	"bytes"
+	"context"
 	"strconv"
 	"time"
 
@@ -294,4 +295,8 @@ func (a *Article) TotalReadNum() (int64, error) {
 	var res = new(int64)
 	err := ORM.Raw("select sum(read_count) from article where status = 2").QueryRow(res)
 	return *res, err
+}
+
+func (a *Article) GetQS(ctx context.Context) orm.QuerySeter {
+	return ORM.QueryTableWithCtx(ctx, "article")
 }

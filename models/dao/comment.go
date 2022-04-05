@@ -2,10 +2,13 @@ package dao
 
 import (
 	"bytes"
+	"context"
 	"strconv"
 
 	"bbs-back/base/common"
 	"bbs-back/models/entity"
+
+	"github.com/beego/beego/v2/adapter/orm"
 )
 
 type Comment struct {
@@ -145,4 +148,8 @@ func (c *Comment) Update() error {
 	}
 	_, err := ORM.Update(c, cols...)
 	return err
+}
+
+func (c *Comment) GetQS(ctx context.Context) orm.QuerySeter {
+	return ORM.QueryTableWithCtx(ctx, "comment")
 }
