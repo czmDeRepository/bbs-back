@@ -13,8 +13,8 @@ import (
 func Init() {
 	//monitor()
 	task := cron.New()
-	// 1点开始两小时一次
-	task.AddFunc("0 0 1/2 * * ?", ExecMonitor)
+	// 两小时一次
+	task.AddFunc("10 0 0/2 * * ?", ExecMonitor)
 	ExecMonitor()
 	task.Start()
 }
