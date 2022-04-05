@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"runtime"
 
+	"bbs-back/base/dto/information"
+
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/robfig/cron"
 )
@@ -50,4 +52,42 @@ func isFail(function func() error) bool {
 		return true
 	}
 	return false
+}
+
+// GetResult 获取监控入口
+func GetResult() (map[string]interface{}, error) {
+	// user
+	userGender, err := getUserGender()
+	if err != nil {
+		return nil, err
+	}
+	userIncrease, err := getUserIncrease()
+	if err != nil {
+		return nil, err
+	}
+	userYears, err := GetUserYears()
+	if err != nil {
+		return nil, err
+	}
+	// article
+	activeVisitors, err := getActiveVisitors()
+	if err != nil {
+		return nil, err
+	}
+	articleIncrease, err := getArticleIncrease()
+	if err != nil {
+		return nil, err
+	}
+	commentIncrease, err := getCommentIncrease()
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		USER_GENDER:                    userGender,
+		USER_INCREASE_NUM:              userIncrease,
+		USER_YEARS:                     userYears,
+		information.ACTIVE_VISITOR_NUM: activeVisitors,
+		ARTICLE_INCREASE_NUM:           articleIncrease,
+		COMMENT_INCREASE_NUM:           commentIncrease,
+	}, nil
 }
