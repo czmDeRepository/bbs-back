@@ -55,9 +55,19 @@ func isFail(function func() error) bool {
 }
 
 // GetResult 获取监控入口
-func GetResult() (map[string]interface{}, error) {
+func GetResult(days int) (map[string]interface{}, error) {
+	if days > MONITOR_DAYS {
+		days = MONITOR_DAYS
+	}
+	if days <= 0 {
+		days = 7
+	}
 	// user
 	userGender, err := getUserGender()
+	if err != nil {
+		return nil, err
+	}
+	userYears, err := getUserYears()
 	if err != nil {
 		return nil, err
 	}
@@ -65,15 +75,11 @@ func GetResult() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	userYears, err := GetUserYears()
-	if err != nil {
-		return nil, err
-	}
-	// article
 	activeVisitors, err := getActiveVisitors()
 	if err != nil {
 		return nil, err
 	}
+	// article
 	articleIncrease, err := getArticleIncrease()
 	if err != nil {
 		return nil, err
@@ -84,10 +90,41 @@ func GetResult() (map[string]interface{}, error) {
 	}
 	return map[string]interface{}{
 		USER_GENDER:                    userGender,
-		USER_INCREASE_NUM:              userIncrease,
 		USER_YEARS:                     userYears,
-		information.ACTIVE_VISITOR_NUM: activeVisitors,
-		ARTICLE_INCREASE_NUM:           articleIncrease,
-		COMMENT_INCREASE_NUM:           commentIncrease,
+		USER_INCREASE_NUM:              userIncrease[MONITOR_DAYS-days:],
+		information.ACTIVE_VISITOR_NUM: activeVisitors[MONITOR_DAYS-days:],
+		ARTICLE_INCREASE_NUM:           articleIncrease[MONITOR_DAYS-days:],
+		COMMENT_INCREASE_NUM:           commentIncrease[MONITOR_DAYS-days:],
+	}, nil
+}
+
+func GetUser(days int) (map[string]interface{}, error) {
+	userIncrease, err := getUserIncrease()
+	if err != nil {
+		return nil, err
+	}
+	activeVisitors, err := getActiveVisitors()
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		USER_INCREASE_NUM:              userIncrease[MONITOR_DAYS-days:],
+		information.ACTIVE_VISITOR_NUM: activeVisitors[MONITOR_DAYS-days:],
+	}, nil
+}
+
+func GetArticle(days int) (map[string]interface{}, error) {
+	// article
+	articleIncrease, err := getArticleIncrease()
+	if err != nil {
+		return nil, err
+	}
+	commentIncrease, err := getCommentIncrease()
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		ARTICLE_INCREASE_NUM: articleIncrease[MONITOR_DAYS-days:],
+		COMMENT_INCREASE_NUM: commentIncrease[MONITOR_DAYS-days:],
 	}, nil
 }

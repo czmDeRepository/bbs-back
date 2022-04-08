@@ -14,4 +14,4 @@ const (
 )
 
 // 统计天数
-const MONITOR_DAYS = 7
+const MONITOR_DAYS = 30

@@ -7,11 +7,10 @@ import (
 	"time"
 
 	"bbs-back/base/dto/information"
-
-	"github.com/beego/beego/v2/core/logs"
-
 	"bbs-back/base/storage"
 	"bbs-back/models/dao"
+
+	"github.com/beego/beego/v2/core/logs"
 )
 
 // 设置用户性别比
@@ -83,7 +82,7 @@ func userYears() error {
 	return storage.GetRedisPool().SetJson(USER_YEARS, userMonitorList)
 }
 
-func GetUserYears() ([]Result, error) {
+func getUserYears() ([]Result, error) {
 	var userMonitorList []Result
 	userMonitorListStr, err := storage.GetRedisPool().Get(USER_YEARS)
 	if err != nil {
