@@ -44,6 +44,11 @@ func ExecMonitor() {
 	if isFail(commentIncrease) {
 		return
 	}
+
+	// 清除过期群聊日活
+	if isFail(clearChat) {
+		return
+	}
 }
 
 func isFail(function func() error) bool {
@@ -71,30 +76,41 @@ func GetResult(days int) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	userIncrease, err := getUserIncrease()
+	userIncrease, err := getUserIncrease(days)
 	if err != nil {
 		return nil, err
 	}
-	activeVisitors, err := getActiveVisitors()
+	activeVisitors, err := getActiveVisitors(days)
 	if err != nil {
 		return nil, err
 	}
 	// article
-	articleIncrease, err := getArticleIncrease()
+	articleIncrease, err := getArticleIncrease(days)
 	if err != nil {
 		return nil, err
 	}
-	commentIncrease, err := getCommentIncrease()
+	commentIncrease, err := getCommentIncrease(days)
+	if err != nil {
+		return nil, err
+	}
+
+	chatOnlineNum, err := getChatOnlineNum(days)
+	if err != nil {
+		return nil, err
+	}
+	chatMessageNums, err := getChatMessageNum(days)
 	if err != nil {
 		return nil, err
 	}
 	return map[string]interface{}{
 		USER_GENDER:                    userGender,
 		USER_YEARS:                     userYears,
-		USER_INCREASE_NUM:              userIncrease[MONITOR_DAYS-days:],
-		information.ACTIVE_VISITOR_NUM: activeVisitors[MONITOR_DAYS-days:],
-		ARTICLE_INCREASE_NUM:           articleIncrease[MONITOR_DAYS-days:],
-		COMMENT_INCREASE_NUM:           commentIncrease[MONITOR_DAYS-days:],
+		USER_INCREASE_NUM:              userIncrease,
+		information.ACTIVE_VISITOR_NUM: activeVisitors,
+		ARTICLE_INCREASE_NUM:           articleIncrease,
+		COMMENT_INCREASE_NUM:           commentIncrease,
+		CHART_MAX_ONLINE_NUM:           chatOnlineNum,
+		CHAT_MESSAGEG_NUM:              chatMessageNums,
 	}, nil
 }
 
@@ -103,28 +119,43 @@ func GetUser(days int) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	activeVisitors, err := getActiveVisitors()
+	activeVisitors, err := getActiveVisitors(days)
 	if err != nil {
 		return nil, err
 	}
 	return map[string]interface{}{
-		USER_INCREASE_NUM:              userIncrease[MONITOR_DAYS-days:],
-		information.ACTIVE_VISITOR_NUM: activeVisitors[MONITOR_DAYS-days:],
+		USER_INCREASE_NUM:              userIncrease,
+		information.ACTIVE_VISITOR_NUM: activeVisitors,
 	}, nil
 }
 
 func GetArticle(days int) (map[string]interface{}, error) {
 	// article
-	articleIncrease, err := getArticleIncrease()
+	articleIncrease, err := getArticleIncrease(days)
 	if err != nil {
 		return nil, err
 	}
-	commentIncrease, err := getCommentIncrease()
+	commentIncrease, err := getCommentIncrease(days)
 	if err != nil {
 		return nil, err
 	}
 	return map[string]interface{}{
-		ARTICLE_INCREASE_NUM: articleIncrease[MONITOR_DAYS-days:],
-		COMMENT_INCREASE_NUM: commentIncrease[MONITOR_DAYS-days:],
+		ARTICLE_INCREASE_NUM: articleIncrease,
+		COMMENT_INCREASE_NUM: commentIncrease,
+	}, nil
+}
+
+func GetChat(days int) (map[string]interface{}, error) {
+	chatOnlineNums, err := getChatOnlineNum(days)
+	if err != nil {
+		return nil, err
+	}
+	chatMessageNums, err := getChatMessageNum(days)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		CHART_MAX_ONLINE_NUM: chatOnlineNums,
+		CHAT_MESSAGEG_NUM:    chatMessageNums,
 	}, nil
 }

@@ -130,11 +130,14 @@ func userIncrease() error {
 	return err
 }
 
-func getUserIncrease() ([]Result, error) {
+func getUserIncrease(days ...int) ([]Result, error) {
 	var increaseList []Result
 	err := storage.GetRedisPool().GetJson(USER_INCREASE_NUM, &increaseList)
 	if err != nil {
 		return nil, err
+	}
+	if len(days) > 0 && days[0] > 0 && len(increaseList) > MONITOR_DAYS-days[0] {
+		increaseList = increaseList[MONITOR_DAYS-days[0]:]
 	}
 	return increaseList, nil
 }
@@ -143,9 +146,13 @@ func clearActiveVisitor() error {
 	return storage.GetRedisPool().Del(information.GetActiveVisitorKey(time.Now().Add(-(1 + MONITOR_DAYS) * 24 * time.Hour)))
 }
 
-func getActiveVisitors() ([]Result, error) {
+func getActiveVisitors(days ...int) ([]Result, error) {
 	var activeVisitors []Result
-	for i := MONITOR_DAYS - 1; i >= 0; i-- {
+	advanceDates := MONITOR_DAYS
+	if len(days) > 0 && days[0] > 0 {
+		advanceDates = days[0]
+	}
+	for i := advanceDates - 1; i >= 0; i-- {
 		current := time.Now().Add(-time.Duration(24*i) * time.Hour)
 		year, month, day := current.Date()
 		active, err := storage.GetRedisPool().PFCOUNT(information.GetActiveVisitorKey(current))

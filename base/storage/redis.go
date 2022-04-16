@@ -71,7 +71,7 @@ func (pool *RedisPool) do(commandName string, args ...interface{}) (reply interf
 	con := GetRedisPool().Pool.Get()
 	err, ok := con.(error)
 	if ok {
-		panic(err)
+		logs.Error("redisPool get connect fail： %s", err.Error())
 	}
 	defer con.Close()
 	return logCommand(con, commandName, args...)
@@ -110,7 +110,11 @@ func (pool *RedisPool) Get(key string) (string, error) {
 redis  GET
 */
 func (pool *RedisPool) GetInt64(key string) (int64, error) {
-	return redis.Int64(pool.do("GET", key))
+	res, err := pool.do("GET", key)
+	if err != nil || res == nil {
+		return 0, err
+	}
+	return redis.Int64(res, err)
 }
 
 /**
@@ -251,4 +255,30 @@ Hyperloglog 基数统计
 */
 func (pool *RedisPool) PFCOUNT(key string) (int64, error) {
 	return redis.Int64(pool.do("PFCOUNT", key))
+}
+
+/**
+SetBit 将bitmap中index偏移量值置为1（value == nil or value[0] == true）,0(value[0]==false)
+*/
+func (pool *RedisPool) SetBit(key string, index int64, value ...bool) (err error) {
+	val := 1
+	if len(value) > 0 && !value[0] {
+		val = 0
+	}
+	_, err = pool.do("SETBIT", key, index, val)
+	return
+}
+
+/**
+GetBit 获取bitmap偏移量为index的值
+*/
+func (pool *RedisPool) GetBit(key string, index int) (bool, error) {
+	return redis.Bool(pool.do("GETBIT", key, index))
+}
+
+/**
+BitCount 统计bitmap
+*/
+func (pool *RedisPool) BitCount(key string) (int64, error) {
+	return redis.Int64(pool.do("BITCOUNT", key))
 }

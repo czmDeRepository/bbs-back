@@ -70,6 +70,8 @@ func (controller *Monitor) GetByType() {
 		result, err = monitor.GetArticle(days)
 	case "user":
 		result, err = monitor.GetUser(days)
+	case "chat":
+		result, err = monitor.GetChat(days)
 	default:
 		controller.end(common.ErrorWithMe(fmt.Sprintf("not type【%s】 exist", monitorType)))
 		return

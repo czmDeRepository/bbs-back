@@ -40,11 +40,14 @@ func articleIncrease() error {
 	return storage.GetRedisPool().SetJson(ARTICLE_INCREASE_NUM, increaseList)
 }
 
-func getArticleIncrease() ([]Result, error) {
+func getArticleIncrease(days ...int) ([]Result, error) {
 	var increaseList []Result
 	err := storage.GetRedisPool().GetJson(ARTICLE_INCREASE_NUM, &increaseList)
 	if err != nil {
 		return nil, err
+	}
+	if len(days) > 0 && days[0] > 0 && len(increaseList) > MONITOR_DAYS-days[0] {
+		increaseList = increaseList[MONITOR_DAYS-days[0]:]
 	}
 	return increaseList, nil
 }

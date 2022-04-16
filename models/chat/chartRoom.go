@@ -3,7 +3,9 @@ package chat
 import (
 	"time"
 
+	"bbs-back/base/storage"
 	"bbs-back/models/dao"
+	"bbs-back/models/monitor"
 
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/gorilla/websocket"
@@ -70,6 +72,25 @@ func OnLineNum() int64 {
 	return res
 }
 
+// 获取当天最大群聊人数
+func GetMaxOnlineNum() int64 {
+	res, err := storage.GetRedisPool().BitCount(monitor.GetDateKey(monitor.CHART_MAX_ONLINE_NUM))
+	if err != nil {
+		logs.Error("chat: get %s fail: %s", monitor.GetDateKey(monitor.CHART_MAX_ONLINE_NUM), err.Error())
+	}
+	return res
+}
+
+// 获取群聊消息数
+func GetMessageNum() int64 {
+	messageNum, err := storage.GetRedisPool().GetInt64(monitor.GetDateKey(monitor.CHAT_MESSAGEG_NUM))
+	if err != nil {
+		logs.Error("chat get %s fail: %s", monitor.GetDateKey(monitor.CHAT_MESSAGEG_NUM), err.Error())
+		return 0
+	}
+	return messageNum
+}
+
 func NewEvent(categoryId int64, ep EventType, user *dao.User, content *Content) *Event {
 	return &Event{categoryId, ep, user, int(time.Now().Unix()), content, 0}
 }
@@ -100,6 +121,7 @@ func addSubscribe(sub *Subscribe, isJoin bool) {
 	if isJoin {
 		Publish <- NewEvent(sub.CategoryId, EVENT_JOIN, sub.User, nil)
 		logs.Critical("New user:", sub.User.Name, ";WebSocket:", sub.Ws != nil)
+		storage.GetRedisPool().SetBit(monitor.GetDateKey(monitor.CHART_MAX_ONLINE_NUM), sub.User.Id)
 	}
 }
 
@@ -162,7 +184,7 @@ func handlePublishEvent(event *Event) {
 			} else {
 				directionalPush(event)
 			}
-
+			storage.GetRedisPool().Incr(monitor.GetDateKey(monitor.CHAT_MESSAGEG_NUM))
 		}
 	} else {
 		broadcast(event)
