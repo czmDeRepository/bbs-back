@@ -19,8 +19,8 @@ var driverString *captcha.DriverString
 func InitCaptcha() {
 	// config see(https://captcha.mojotv.cn/)
 	driverString = &captcha.DriverString{
-		Height:          130,
-		Width:           240,
+		Height:          40,
+		Width:           140,
 		NoiseCount:      0,
 		ShowLineOptions: captcha.OptionShowHollowLine,
 		Length:          5,
