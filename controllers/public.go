@@ -90,6 +90,23 @@ func (controller *PublicController) Upload() {
 	controller.end(common.SuccessWithData(filePath[1:]))
 }
 
+// @Title	BeforeUpload
+// @Description 校验文件是否存在
+// @Param	fileName	string	true	"文件名"
+// @router /upload [options]
+func (controller *PublicController) BeforeUpload() {
+	controller.mustLogin()
+	fileName := controller.GetString("fileName")
+	filePath := enum.RESOURCES_IMAGE_PATH + fileName
+	_, err := os.Stat(filePath)
+	if err == nil {
+		// 文件已存在，不再io
+		controller.end(common.SuccessWithData(filePath[1:]))
+		return
+	}
+	controller.end(common.ErrorWithMe(fileName + " no exist"))
+}
+
 // @Title	Information
 // @router  /information [get]
 func (controller *PublicController) Information() {
