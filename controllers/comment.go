@@ -99,6 +99,8 @@ func (controller *CommentController) Put() {
 	param := new(dao.Comment)
 	param.Id = comment.Id
 	param.UserId = curUserId
+	// 修改只需要id查询校验
+	param.CommentId = -1
 	count, err := param.Count()
 	if err != nil {
 		controller.end(common.HandleError(err))
