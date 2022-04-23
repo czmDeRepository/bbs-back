@@ -315,7 +315,7 @@ func (controller *UserController) Login() {
 	}
 	switch user.Status {
 	case dao.USER_STATUS_BLACKLIST:
-		controller.end(common.ErrorWithMe("您目前被限制登陆，请联系管理员解锁！！！"))
+		controller.end(common.ErrorWithMe("您目前被限制登陆！！！"))
 		return
 	case dao.USER_STATUS_CANCELLATION:
 		controller.end(common.ErrorWithMe("当前账号已注销！！！"))
