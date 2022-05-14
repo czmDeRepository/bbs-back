@@ -175,6 +175,7 @@ func (a *Article) Insert(labelIdList ...string) error {
 	if a.Status == 0 {
 		a.Status = 2
 	}
+	a.UpdateTime.Time = time.Now()
 	id, err := ORM.Insert(a)
 	a.Id = id
 	if len(labelIdList) > 0 {
