@@ -102,6 +102,7 @@ func (controller *ArticleController) Put() {
 		param := new(dao.Article)
 		param.UserId = curUserId
 		param.Id = article.Id
+		param.Status = dao.SELECT_ALL
 		count, err := param.Count(nil)
 		if err != nil {
 			controller.end(common.HandleError(err))
@@ -166,6 +167,7 @@ func (controller *ArticleController) Delete() {
 	article.Id = id
 	if role != dao.USER_ROLE_SUPER_ADMIN && role != dao.USER_ROLE_ADMIN {
 		article.UserId = userId
+		article.Status = dao.SELECT_ALL
 		count, _ := article.Count(nil)
 		if count == 0 {
 			controller.end(common.ErrorWithMe("非法删除他人帖子"))

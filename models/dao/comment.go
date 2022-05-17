@@ -126,10 +126,18 @@ func (c *Comment) Count() (int64, error) {
 	return qs.Count()
 }
 
-func (c *Comment) Delete() error {
+func (c *Comment) Delete(ctx context.Context) error {
 	c.Status = -1
 	_, err := ORM.Update(c, "status")
-	return err
+	if err != nil {
+		return err
+	}
+	// 删除消息
+	m, err := new(Message).FindByCommentId(ctx, c.Id)
+	if err != nil {
+		return err
+	}
+	return m.Delete(ctx)
 }
 
 func (c *Comment) Update() error {

@@ -210,6 +210,7 @@ func (controller *CommentController) Delete() {
 	if curUserRole != dao.USER_ROLE_ADMIN && curUserRole != dao.USER_ROLE_SUPER_ADMIN {
 		// start 普通用户只允许删除自己评论
 		comment.UserId = curUserId
+		comment.CommentId = -1
 		count, err := comment.Count()
 		if err != nil {
 			controller.end(common.HandleError(err))
@@ -221,7 +222,7 @@ func (controller *CommentController) Delete() {
 		}
 		// end
 	}
-	err := comment.Delete()
+	err := comment.Delete(controller.context())
 	if err != nil {
 		controller.end(common.HandleError(err))
 		return

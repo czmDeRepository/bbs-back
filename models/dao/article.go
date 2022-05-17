@@ -36,50 +36,16 @@ func (a *Article) Read() (*Article, error) {
 	return res, err
 }
 
-func (a *Article) createQsByParam() orm.QuerySeter {
-	qs := ORM.QueryTable(a)
-	if a.Id != 0 {
-		qs = qs.Filter("id", a.Id)
-	}
-	if a.Title != "" {
-		qs = qs.Filter("title__icontains", a.Title)
-	}
-	if a.UserId != 0 {
-		qs = qs.Filter("user_id", a.UserId)
-	}
-	if a.Status != 0 {
-		qs = qs.Filter("status", a.Status)
-	} else {
-		qs = qs.Filter("status", 1)
-	}
-	if a.ReadCount != 0 {
-		qs = qs.Filter("read_count", a.ReadCount)
-	}
-	if !a.CreateTime.IsZero() {
-		qs = qs.Filter("create_time", a.CreateTime.Time)
-	}
-	if !a.UpdateTime.IsZero() {
-		qs = qs.Filter("update_time", a.UpdateTime.Time)
-	}
-	return qs
-}
-
 var ORDER_BY_LIST = []string{
 	"update_time",
 	"create_time",
 	"read_count",
 }
 
+const SELECT_ALL = -12580
+
 func (a *Article) Find(page *common.Page, orderIndex int32, isAsc bool, rangeTime *common.RangeTime, labelIdList ...string) ([]*Article, error) {
 	var res []*Article
-	//var qs orm.QuerySeter
-	//if page.NeedPage() {
-	//	qs = a.createQsByParam().Limit(page.GetPageSize(), page.GetPageNum() - 1)
-	//} else {
-	//	qs = a.createQsByParam()
-	//}
-	//"id", "title", "category_id", "user_id", "status", "support_count", "read_count","create_time", "update_time"
-	//_, err := qs.All(&res,cols...)
 
 	sql := a.createRawSql("a.id, a.title, a.category_id, a.user_id, a.status, a.support_count, a.read_count, a.create_time, a.update_time", rangeTime, labelIdList...)
 	sql.WriteString(" order by ")
@@ -106,8 +72,6 @@ func (a *Article) Find(page *common.Page, orderIndex int32, isAsc bool, rangeTim
 }
 
 func (a *Article) Count(rangeTime *common.RangeTime, labelIdList ...string) (int64, error) {
-	//qs := a.createQsByParam()
-	//return qs.Count()
 	var res int64
 	sql := a.createRawSql("count(*)", rangeTime, labelIdList...)
 	err := ORM.Raw(sql.String()).QueryRow(&res)
@@ -122,7 +86,10 @@ func (a *Article) createRawSql(cols string, rangeTime *common.RangeTime, labelId
 	if a.FollowingFlag {
 		sql.WriteString(" inner join article_follower af on a.id = af.article_id ")
 	}
-	if a.Status == 0 {
+
+	if a.Status == SELECT_ALL {
+		sql.WriteString(" where 1=1")
+	} else if a.Status == 0 {
 		sql.WriteString(" where a.status = 2")
 	} else {
 		sql.WriteString(" where a.status = ")

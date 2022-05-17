@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 
 	"bbs-back/base/common"
 	"bbs-back/models/entity"
@@ -31,23 +32,41 @@ func (m *Message) Read(ctx context.Context) (*Message, error) {
 	return res, err
 }
 
+func (m *Message) FindByCommentId(ctx context.Context, commentId int64) (*Message, error) {
+	qs := ORM.QueryTableWithCtx(ctx, m)
+	var res []*Message
+	_, err := qs.Filter("comment_id", commentId).All(&res)
+	if err != nil {
+		return nil, err
+	}
+	if len(res) > 0 {
+		return res[0], nil
+	}
+	return nil, errors.New("not found")
+}
 func (m *Message) Find(ctx context.Context, page *common.Page, cols ...string) ([]*Message, error) {
 	qs := m.createQsByParam(ctx)
 	qs = qs.OrderBy("type", "-create_time")
 	qs = qs.Limit(page.GetPageSize(), page.GetOffset())
+	var messageList []*Message
 	var res []*Message
+	var err error
 	if len(cols) > 0 {
-		_, err := qs.All(&res, cols...)
-		return res, err
+		_, err = qs.All(&messageList, cols...)
+	} else {
+		_, err = qs.All(&messageList)
 	}
-	_, err := qs.All(&res)
 	if err != nil {
 		return nil, err
 	}
 	comment := new(Comment)
-	for _, message := range res {
+	for _, message := range messageList {
 		comment.Id = message.CommentId
 		message.Comment, _ = comment.Read()
+		// 只返回正常评论的消息
+		if message.Comment.Status == 1 {
+			res = append(res, message)
+		}
 	}
 	return res, err
 }
