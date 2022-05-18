@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"errors"
 
 	"bbs-back/base/common"
 	"bbs-back/models/entity"
@@ -35,14 +34,14 @@ func (m *Message) Read(ctx context.Context) (*Message, error) {
 func (m *Message) FindByCommentId(ctx context.Context, commentId int64) (*Message, error) {
 	qs := ORM.QueryTableWithCtx(ctx, m)
 	var res []*Message
-	_, err := qs.Filter("comment_id", commentId).All(&res)
+	_, err := qs.Filter("status", 1).Filter("comment_id", commentId).All(&res)
 	if err != nil {
 		return nil, err
 	}
 	if len(res) > 0 {
 		return res[0], nil
 	}
-	return nil, errors.New("not found")
+	return nil, orm.ErrNoRows
 }
 func (m *Message) Find(ctx context.Context, page *common.Page, cols ...string) ([]*Message, error) {
 	qs := m.createQsByParam(ctx)

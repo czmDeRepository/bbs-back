@@ -115,7 +115,7 @@ func GetResult(days int) (map[string]interface{}, error) {
 }
 
 func GetUser(days int) (map[string]interface{}, error) {
-	userIncrease, err := getUserIncrease()
+	userIncrease, err := getUserIncrease(days)
 	if err != nil {
 		return nil, err
 	}

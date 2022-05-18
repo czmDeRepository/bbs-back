@@ -8,7 +8,7 @@ import (
 	"bbs-back/base/common"
 	"bbs-back/models/entity"
 
-	"github.com/beego/beego/v2/adapter/orm"
+	"github.com/beego/beego/v2/client/orm"
 )
 
 type Comment struct {
@@ -134,6 +134,10 @@ func (c *Comment) Delete(ctx context.Context) error {
 	}
 	// 删除消息
 	m, err := new(Message).FindByCommentId(ctx, c.Id)
+	// 没有存在的消息，已删除或评论没触发消息发送
+	if err == orm.ErrNoRows {
+		return nil
+	}
 	if err != nil {
 		return err
 	}

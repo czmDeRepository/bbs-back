@@ -156,6 +156,7 @@ func (a *Article) Delete() error {
 	a.Status = -1
 	a.UpdateTime.Time = time.Now()
 	_, err := ORM.Update(a, "status")
+	storage.GetRedisPool().IncrBy(information.TOTAL_ARTICLE_NUM, -1)
 	return err
 }
 
