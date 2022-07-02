@@ -164,3 +164,39 @@ CREATE TABLE `user`  (
 SET FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO `user`(`id`, `name`, `account`, `password`, `email`, `telephone_number`, `status`, `create_time`, `update_time`, `role`, `gender`,`birthday`) VALUES (1, 'admin', 'admin', '299f39bf4e1d6d2328717ae49f016172', '123@qq.com', '18212345721', 1, '2022-04-03 23:31:40', '2022-02-27 15:16:56', '3', '男', '2004-05-19 01:21:37');
+
+
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (1, 'java', '2021-10-15 15:45:23', '2021-11-20 18:43:57', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (2, 'golang', '2021-10-15 15:45:56', '2021-11-20 19:23:26', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (3, 'c', '2021-10-15 15:46:02', '2021-10-15 18:29:38', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (4, 'c++', '2021-10-15 15:46:05', '2021-10-15 18:29:41', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (5, 'python', '2021-10-15 15:46:12', '2021-10-15 18:29:44', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (6, '其他标签', '2021-10-25 16:40:30', '2021-10-25 16:40:34', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (8, 'JavaScript', '2021-11-20 19:24:01', '2022-05-17 23:44:05', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (9, 'sql', '2021-11-20 19:28:54', '2022-05-14 15:57:54', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (10, 'linux', '2022-05-14 15:58:02', '2022-05-14 15:58:02', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (11, '旅游', '2022-05-14 16:08:02', '2022-05-14 16:08:02', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (12, '生活', '2022-05-17 21:23:32', '2022-05-17 21:23:32', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (13, '工具', '2022-05-17 23:42:11', '2022-05-17 23:42:37', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (14, '分享', '2022-05-18 00:48:56', '2022-05-18 00:48:56', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (15, '笔记', '2022-05-18 00:49:03', '2022-05-18 00:49:03', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (16, '前端', '2022-05-18 20:52:01', '2022-05-18 20:52:01', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (17, '后端', '2022-05-18 20:52:06', '2022-05-18 20:52:06', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (18, 'redis', '2022-05-18 20:54:54', '2022-05-18 20:54:54', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (19, '框架', '2022-05-18 21:40:52', '2022-05-18 21:40:52', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (20, '操作系统', '2022-05-18 22:11:05', '2022-05-18 22:12:08', 1);
+INSERT INTO `label`(`id`, `name`, `create_time`, `update_time`, `status`) VALUES (21, '计网', '2022-05-19 00:27:52', '2022-05-19 00:27:52', 1);
+
+
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (1, '生活', '2021-10-14 02:59:13', '2021-11-20 17:18:07');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (2, '工作', '2021-10-14 03:03:02', '2021-10-14 03:03:05');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (4, '大学', '2021-10-14 03:13:59', '2021-10-14 03:13:59');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (5, '程序员', '2021-10-14 03:37:08', '2021-10-14 03:38:57');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (6, '其他分类', '2021-10-25 16:40:08', '2021-11-20 17:25:14');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (8, '新分类', '2021-11-20 17:25:36', '2021-11-20 17:29:46');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (9, '学术', '2021-11-20 17:30:09', '2022-05-14 15:57:33');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (10, '家庭', '2022-05-14 15:57:20', '2022-05-14 15:57:20');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (11, '娱乐', '2022-05-14 15:58:53', '2022-05-14 15:58:53');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (12, '数据库', '2022-05-14 16:27:59', '2022-05-14 16:27:59');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (13, '影视', '2022-05-17 23:43:03', '2022-05-17 23:43:03');
+INSERT INTO `category`(`id`, `name`, `create_time`, `update_time`) VALUES (14, '问题', '2022-05-18 01:50:08', '2022-05-18 01:50:08');
